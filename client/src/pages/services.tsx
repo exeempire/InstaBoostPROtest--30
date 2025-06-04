@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ServiceModal } from "@/components/service-modal";
@@ -19,6 +20,7 @@ interface Service {
 
 export default function Services() {
   const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -29,6 +31,11 @@ export default function Services() {
 
   const handleOrderService = (service: Service) => {
     if (!isAuthenticated) {
+      toast({
+        title: "Login Required",
+        description: "Please login with your Instagram account first to place an order.",
+        variant: "destructive",
+      });
       setIsAuthModalOpen(true);
       return;
     }

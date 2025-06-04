@@ -1,0 +1,144 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --charcoal-dark: 14 29 24; /* #0e1d18 */
+  --charcoal: 18 38 32; /* #122620 */
+  --gold: 214 173 96; /* #d6ad60 */
+  --tan: 182 141 64; /* #b68d40 */
+  --cream: 244 235 208; /* #f4ebd0 */
+  
+  --background: var(--charcoal-dark);
+  --foreground: var(--cream);
+  --muted: 18 38 32;
+  --muted-foreground: 244 235 208 / 0.7;
+  --popover: var(--charcoal);
+  --popover-foreground: var(--cream);
+  --card: var(--charcoal);
+  --card-foreground: var(--cream);
+  --border: 214 173 96 / 0.2;
+  --input: 214 173 96 / 0.2;
+  --primary: var(--gold);
+  --primary-foreground: var(--charcoal);
+  --secondary: var(--charcoal);
+  --secondary-foreground: var(--cream);
+  --accent: var(--charcoal);
+  --accent-foreground: var(--cream);
+  --destructive: 0 84% 60%;
+  --destructive-foreground: var(--cream);
+  --ring: var(--gold);
+  --radius: 1rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background-color: hsl(var(--charcoal-dark));
+    color: hsl(var(--cream));
+    font-family: 'Poppins', sans-serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gradient-to-r from-gold to-tan text-charcoal-dark px-6 py-3 rounded-full font-semibold hover:shadow-lg hover:shadow-gold/30 transition-all duration-300 hover:scale-105;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-gold text-gold px-6 py-3 rounded-full font-semibold hover:bg-gold/10 hover:shadow-lg hover:shadow-gold/20 transition-all duration-300;
+  }
+  
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  
+  .nav-link {
+    @apply text-cream hover:text-gold transition-colors duration-300 font-medium;
+  }
+}
+
+@layer utilities {
+  .text-charcoal-dark {
+    color: hsl(var(--charcoal-dark));
+  }
+  
+  .text-charcoal {
+    color: hsl(var(--charcoal));
+  }
+  
+  .text-gold {
+    color: hsl(var(--gold));
+  }
+  
+  .text-tan {
+    color: hsl(var(--tan));
+  }
+  
+  .text-cream {
+    color: hsl(var(--cream));
+  }
+  
+  .bg-charcoal-dark {
+    background-color: hsl(var(--charcoal-dark));
+  }
+  
+  .bg-charcoal {
+    background-color: hsl(var(--charcoal));
+  }
+  
+  .bg-gold {
+    background-color: hsl(var(--gold));
+  }
+  
+  .bg-tan {
+    background-color: hsl(var(--tan));
+  }
+  
+  .bg-cream {
+    background-color: hsl(var(--cream));
+  }
+  
+  .border-gold {
+    border-color: hsl(var(--gold));
+  }
+  
+  .from-gold {
+    --tw-gradient-from: hsl(var(--gold));
+  }
+  
+  .to-tan {
+    --tw-gradient-to: hsl(var(--tan));
+  }
+  
+  .shadow-gold {
+    --tw-shadow-color: hsl(var(--gold));
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px hsl(var(--gold) / 0.5);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 25px hsl(var(--gold) / 0.8);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}

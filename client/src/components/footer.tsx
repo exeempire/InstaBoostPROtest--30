@@ -53,14 +53,14 @@ export function Footer() {
           {/* Brand Section */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-4 mb-6">
-              <div className="w-16 h-16 bg-gradient-to-br from-gold to-tan rounded-xl flex items-center justify-center shadow-xl">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-charcoal">
-                  <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor"/>
-                  <path d="M19.5 14.5L20.5 17.5L23.5 18.5L20.5 19.5L19.5 22.5L18.5 19.5L15.5 18.5L18.5 17.5L19.5 14.5Z" fill="currentColor"/>
-                  <path d="M4.5 1.5L5.5 4.5L8.5 5.5L5.5 6.5L4.5 9.5L3.5 6.5L0.5 5.5L3.5 4.5L4.5 1.5Z" fill="currentColor"/>
-                </svg>
+              <div className="w-20 h-20 bg-gradient-to-br from-gold to-tan rounded-xl flex items-center justify-center shadow-xl overflow-hidden">
+                <img 
+                  src="https://files.catbox.moe/95hr3x.png" 
+                  alt="InstaBoost Pro Logo" 
+                  className="w-16 h-16 object-contain"
+                />
               </div>
-              <span className="text-gold font-bold text-2xl">InstaBoost Pro</span>
+              <span className="text-gold font-bold text-3xl">InstaBoost Pro</span>
             </div>
             <p className="text-cream/70 mb-6 max-w-md">
               Premium SMM panel providing high-quality Instagram services with 24/7 support, 

@@ -152,6 +152,17 @@ function generateOrderId(): string {
 export async function registerRoutes(app: Express): Promise<Server> {
   app.use(sessionConfig);
 
+  // Health check endpoint
+  app.get("/api/health", async (req, res) => {
+    try {
+      // Test database connection
+      await storage.getServices();
+      res.json({ status: "healthy", timestamp: new Date().toISOString() });
+    } catch (error) {
+      res.status(500).json({ status: "unhealthy", error: error.message });
+    }
+  });
+
   // Initialize default services
   await storage.initializeServices();
 

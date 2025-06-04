@@ -1,9 +1,24 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
 import session from "express-session";
 import { v4 as uuidv4 } from "uuid";
+
+// Extend session interface
+declare module "express-session" {
+  interface SessionData {
+    userId?: number;
+    uid?: string;
+  }
+}
+
+interface AuthenticatedRequest extends Request {
+  session: session.Session & Partial<session.SessionData> & {
+    userId?: number;
+    uid?: string;
+  };
+}
 
 // Session configuration
 const sessionConfig = session({
@@ -79,7 +94,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   await storage.initializeServices();
 
   // Auth endpoints
-  app.post("/api/auth/login", async (req, res) => {
+  app.post("/api/auth/login", async (req: AuthenticatedRequest, res: Response) => {
     try {
       const { instagramUsername, password } = loginSchema.parse(req.body);
       

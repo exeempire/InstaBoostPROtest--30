@@ -33,15 +33,15 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-gold to-tan rounded-lg flex items-center justify-center shadow-lg overflow-hidden">
+            <Link href="/" className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-gold to-tan rounded-xl flex items-center justify-center shadow-xl overflow-hidden">
                 <img 
                   src="https://files.catbox.moe/95hr3x.png" 
                   alt="InstaBoost Pro Logo" 
-                  className="w-8 h-8 object-contain"
+                  className="w-10 h-10 object-contain"
                 />
               </div>
-              <span className="text-gold font-bold text-xl">InstaBoost Pro</span>
+              <span className="text-gold font-bold text-2xl">InstaBoost Pro</span>
             </Link>
 
             {/* Desktop Navigation */}

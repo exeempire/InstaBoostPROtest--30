@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import { Instagram, Send, Twitter, Facebook } from "lucide-react";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -6,27 +7,27 @@ export function Footer() {
   const socialLinks = [
     {
       name: "Instagram",
-      icon: "fab fa-instagram",
+      icon: Instagram,
       url: "https://instagram.com/instaboostpro",
-      color: "text-pink-500"
+      color: "text-pink-500 hover:text-pink-400"
+    },
+    {
+      name: "Facebook",
+      icon: Facebook,
+      url: "https://facebook.com/instaboostpro",
+      color: "text-blue-600 hover:text-blue-500"
     },
     {
       name: "Telegram",
-      icon: "fab fa-telegram",
+      icon: Send,
       url: "https://t.me/instaboostpro",
-      color: "text-blue-500"
+      color: "text-blue-500 hover:text-blue-400"
     },
     {
       name: "Twitter",
-      icon: "fab fa-twitter",
+      icon: Twitter,
       url: "https://twitter.com/instaboostpro",
-      color: "text-blue-400"
-    },
-    {
-      name: "WhatsApp",
-      icon: "fab fa-whatsapp",
-      url: "https://wa.me/1234567890",
-      color: "text-green-500"
+      color: "text-blue-400 hover:text-blue-300"
     }
   ];
 
@@ -51,15 +52,15 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-gold to-tan rounded-lg flex items-center justify-center shadow-lg">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-charcoal">
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-gold to-tan rounded-xl flex items-center justify-center shadow-xl">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" className="text-charcoal">
                   <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor"/>
                   <path d="M19.5 14.5L20.5 17.5L23.5 18.5L20.5 19.5L19.5 22.5L18.5 19.5L15.5 18.5L18.5 17.5L19.5 14.5Z" fill="currentColor"/>
                   <path d="M4.5 1.5L5.5 4.5L8.5 5.5L5.5 6.5L4.5 9.5L3.5 6.5L0.5 5.5L3.5 4.5L4.5 1.5Z" fill="currentColor"/>
                 </svg>
               </div>
-              <span className="text-gold font-bold text-xl">InstaBoost Pro</span>
+              <span className="text-gold font-bold text-2xl">InstaBoost Pro</span>
             </div>
             <p className="text-cream/70 mb-6 max-w-md">
               Premium SMM panel providing high-quality Instagram services with 24/7 support, 
@@ -68,18 +69,21 @@ export function Footer() {
             
             {/* Social Links */}
             <div className="flex space-x-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.name}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`w-10 h-10 bg-charcoal border border-gold/20 rounded-lg flex items-center justify-center hover:border-gold transition-colors duration-300 ${social.color} hover:scale-110 transform`}
-                  title={social.name}
-                >
-                  <i className={`${social.icon} text-lg`}></i>
-                </a>
-              ))}
+              {socialLinks.map((social) => {
+                const IconComponent = social.icon;
+                return (
+                  <a
+                    key={social.name}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`w-12 h-12 bg-charcoal border border-gold/20 rounded-xl flex items-center justify-center hover:border-gold transition-all duration-300 ${social.color} hover:scale-110 transform hover:shadow-lg`}
+                    title={social.name}
+                  >
+                    <IconComponent size={20} />
+                  </a>
+                );
+              })}
             </div>
           </div>
 

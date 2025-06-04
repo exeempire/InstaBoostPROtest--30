@@ -123,23 +123,28 @@ export default function Dashboard() {
 
         {/* Welcome Bonus Section */}
         {!user?.bonusClaimed && (
-          <div className="bg-gradient-to-r from-gold/20 to-tan/20 border border-gold/30 rounded-xl p-6 mb-8">
+          <div className="bg-gradient-to-r from-gold/20 to-tan/20 border border-gold/30 rounded-xl p-6 mb-8 bonus-card">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xl font-semibold text-gold mb-2">🎁 Welcome Bonus</h3>
-                <p className="text-cream/80">Claim your ₹10 welcome bonus now!</p>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="bonus-icon">
+                    <i className="fas fa-gift text-gold text-2xl heartbeat"></i>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gold">Welcome Bonus</h3>
+                </div>
+                <p className="text-cream/80">Claim your free followers now!</p>
               </div>
               <Button 
                 onClick={handleClaimBonus}
                 disabled={claimBonus.isPending}
-                className="btn-primary pulse-glow"
+                className="btn-primary pulse-glow heartbeat"
               >
                 {claimBonus.isPending ? (
                   <i className="fas fa-spinner fa-spin mr-2"></i>
                 ) : (
-                  <i className="fas fa-gift mr-2"></i>
+                  <i className="fas fa-star mr-2"></i>
                 )}
-                Claim ₹10
+                Claim Now
               </Button>
             </div>
           </div>

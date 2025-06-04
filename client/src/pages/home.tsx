@@ -72,15 +72,17 @@ export default function Home() {
                 </p>
 
                 {/* Welcome Bonus Card */}
-                <div className="inline-block bg-charcoal/90 backdrop-blur-sm border border-gold/30 rounded-2xl p-8 mb-8 shadow-2xl">
+                <div className="inline-block bg-charcoal/90 backdrop-blur-sm border border-gold/30 rounded-2xl p-8 mb-8 shadow-2xl bonus-card">
                   <div className="text-center">
-                    <i className="fas fa-gift text-gold text-4xl mb-4"></i>
+                    <div className="bonus-icon mb-4">
+                      <i className="fas fa-gift text-gold text-5xl heartbeat"></i>
+                    </div>
                     <h3 className="text-2xl font-bold text-gold mb-2">Welcome Bonus</h3>
-                    <p className="text-cream/80 mb-4">Claim your free ₹10 bonus now!</p>
+                    <p className="text-cream/80 mb-4 text-lg">Claim your free followers now!</p>
                     <Button 
                       onClick={handleClaimBonus}
                       disabled={claimBonus.isPending || (isAuthenticated && user?.bonusClaimed)}
-                      className="btn-primary pulse-glow"
+                      className="btn-primary pulse-glow heartbeat"
                     >
                       {claimBonus.isPending ? (
                         <i className="fas fa-spinner fa-spin mr-2"></i>

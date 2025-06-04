@@ -33,7 +33,7 @@ export default function Services() {
   // Show auth modal immediately if not authenticated
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen pt-20 pb-8" style={{ backgroundColor: 'var(--main-bg)' }}>
+      <div className="min-h-screen pt-28 pb-8" style={{ backgroundColor: 'var(--main-bg)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center py-20">
             <div className="mb-8">

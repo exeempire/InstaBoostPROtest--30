@@ -34,7 +34,7 @@ export default function Orders() {
 
   if (isLoading) {
     return (
-      <div className="pt-24 pb-16 px-4">
+      <div className="pt-28 pb-16 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center">
             <i className="fas fa-spinner fa-spin text-gold text-4xl mb-4"></i>
@@ -46,7 +46,7 @@ export default function Orders() {
   }
 
   return (
-    <div className="pt-24 pb-16 px-4">
+    <div className="pt-28 pb-16 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gold mb-4">Order History</h1>

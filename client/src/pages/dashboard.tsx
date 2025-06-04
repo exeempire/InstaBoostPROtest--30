@@ -70,7 +70,7 @@ export default function Dashboard() {
   const totalSpent = orders.reduce((sum, order) => sum + parseFloat(order.price), 0);
 
   return (
-    <div className="pt-24 pb-16 px-4">
+    <div className="pt-28 pb-16 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gold mb-2">Dashboard</h1>

@@ -42,7 +42,7 @@ export default function Wallet() {
   };
 
   return (
-    <div className="pt-24 pb-16 px-4">
+    <div className="pt-28 pb-16 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gold mb-4">Wallet</h1>

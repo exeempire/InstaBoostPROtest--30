@@ -18,10 +18,13 @@ export function Navbar() {
 
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/services", label: "Services" },
-    { href: "/wallet", label: "Wallet" },
-    { href: "/orders", label: "Orders" },
+    { href: "/services", label: "Services", requireAuth: true },
+    { href: "/wallet", label: "Wallet", requireAuth: true },
+    { href: "/add-funds", label: "Add Funds", requireAuth: true },
+    { href: "/orders", label: "Orders", requireAuth: true },
     { href: "/faq", label: "FAQ" },
+    { href: "/terms", label: "Terms" },
+    { href: "/privacy", label: "Privacy" },
   ];
 
   return (
@@ -31,29 +34,42 @@ export function Navbar() {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-gold to-tan rounded-lg flex items-center justify-center shadow-lg">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-charcoal">
-                  <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor"/>
-                  <path d="M19.5 14.5L20.5 17.5L23.5 18.5L20.5 19.5L19.5 22.5L18.5 19.5L15.5 18.5L18.5 17.5L19.5 14.5Z" fill="currentColor"/>
-                  <path d="M4.5 1.5L5.5 4.5L8.5 5.5L5.5 6.5L4.5 9.5L3.5 6.5L0.5 5.5L3.5 4.5L4.5 1.5Z" fill="currentColor"/>
-                </svg>
+              <div className="w-10 h-10 bg-gradient-to-br from-gold to-tan rounded-lg flex items-center justify-center shadow-lg overflow-hidden">
+                <img 
+                  src="https://files.catbox.moe/95hr3x.png" 
+                  alt="InstaBoost Pro Logo" 
+                  className="w-8 h-8 object-contain"
+                />
               </div>
               <span className="text-gold font-bold text-xl">InstaBoost Pro</span>
             </Link>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`nav-link ${
-                    location === link.href ? "text-gold" : ""
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                if (link.requireAuth && !isAuthenticated) {
+                  return (
+                    <button
+                      key={link.href}
+                      onClick={() => setIsAuthModalOpen(true)}
+                      className="nav-link hover:text-gold"
+                    >
+                      {link.label}
+                    </button>
+                  );
+                }
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`nav-link ${
+                      location === link.href ? "text-gold" : ""
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
             </div>
 
             {/* Auth Section */}
@@ -112,45 +128,76 @@ export function Navbar() {
         {isMobileMenuOpen && (
           <div className="md:hidden bg-charcoal border-t border-gold/20">
             <div className="px-4 py-2 space-y-2">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="block px-3 py-2 text-cream hover:text-gold transition-colors duration-300"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <div className="border-t border-gold/20 pt-2 mt-2">
-                {isAuthenticated ? (
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-3 py-2 text-cream hover:text-gold transition-colors"
+              {navLinks.map((link) => {
+                if (link.requireAuth && !isAuthenticated) {
+                  return (
+                    <button
+                      key={link.href}
+                      onClick={() => {
+                        setIsAuthModalOpen(true);
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="block w-full text-left px-3 py-2 text-cream hover:text-gold transition-colors duration-300"
+                    >
+                      {link.label}
+                    </button>
+                  );
+                }
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="block px-3 py-2 text-cream hover:text-gold transition-colors duration-300"
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Logout
-                  </button>
+                    {link.label}
+                  </Link>
+                );
+              })}
+              
+              <div className="border-t border-gold/20 pt-2 mt-2">
+                {isAuthenticated && user ? (
+                  <div className="space-y-2">
+                    {/* Profile Section */}
+                    <div className="px-3 py-2 bg-gold/10 rounded-lg">
+                      <div className="text-gold font-semibold text-sm">Profile</div>
+                      <div className="text-cream text-sm">@{user.instagramUsername}</div>
+                      <div className="flex items-center justify-between mt-2">
+                        <div className="text-cream/70 text-xs">UID: {user.uid}</div>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(user.uid);
+                            setIsMobileMenuOpen(false);
+                          }}
+                          className="text-gold text-xs hover:text-gold/80"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                      <div className="text-gold text-sm font-semibold mt-1">
+                        Balance: ₹{user.walletBalance}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        handleLogout();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="block w-full text-left px-3 py-2 text-red-400 hover:bg-red-400/10 transition-colors rounded-lg"
+                    >
+                      Logout
+                    </button>
+                  </div>
                 ) : (
-                  <>
-                    <button
-                      onClick={() => {
-                        setIsAuthModalOpen(true);
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="block w-full text-left px-3 py-2 text-gold hover:bg-gold/10 transition-colors"
-                    >
-                      Login
-                    </button>
-                    <button
-                      onClick={() => {
-                        setIsAuthModalOpen(true);
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="block w-full text-left px-3 py-2 text-gold hover:bg-gold/10 transition-colors"
-                    >
-                      Sign Up
-                    </button>
-                  </>
+                  <button
+                    onClick={() => {
+                      setIsAuthModalOpen(true);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 text-gold hover:bg-gold/10 transition-colors rounded-lg"
+                  >
+                    Login
+                  </button>
                 )}
               </div>
             </div>

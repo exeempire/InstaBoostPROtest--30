@@ -12,6 +12,8 @@ import AddFunds from "@/pages/add-funds";
 import Orders from "@/pages/orders";
 import Dashboard from "@/pages/dashboard";
 import FAQ from "@/pages/faq";
+import Terms from "@/pages/terms";
+import Privacy from "@/pages/privacy";
 import NotFound from "@/pages/not-found";
 
 function Router() {

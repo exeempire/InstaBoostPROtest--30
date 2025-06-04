@@ -25,6 +25,11 @@ export default function Services() {
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
+  const { data: services = [] } = useQuery<Service[]>({
+    queryKey: ["/api/services"],
+    enabled: isAuthenticated,
+  });
+
   // Show auth modal immediately if not authenticated
   if (!isAuthenticated) {
     return (
@@ -51,10 +56,6 @@ export default function Services() {
       </div>
     );
   }
-
-  const { data: services = [] } = useQuery<Service[]>({
-    queryKey: ["/api/services"],
-  });
 
   const handleOrderService = (service: Service) => {
     if (!isAuthenticated) {

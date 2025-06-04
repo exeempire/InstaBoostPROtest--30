@@ -100,7 +100,7 @@ export function ServiceModal({ isOpen, onClose, service }: ServiceModalProps) {
 
   const handlePriceChange = (value: string) => {
     setPriceInputValue(value);
-    const price = parseFloat(value) || 0;
+    const price = value === "" ? 0 : parseFloat(value) || 0;
     if (price > 0 && rate > 0) {
       const quantity = calculateQuantity(price, rate);
       setQuantityInputValue(quantity.toString());
@@ -111,7 +111,7 @@ export function ServiceModal({ isOpen, onClose, service }: ServiceModalProps) {
 
   const handleQuantityChange = (value: string) => {
     setQuantityInputValue(value);
-    const quantity = parseInt(value) || 0;
+    const quantity = value === "" ? 0 : parseInt(value) || 0;
     if (quantity > 0 && rate > 0) {
       const price = calculatePrice(quantity, rate);
       setPriceInputValue(price.toFixed(2));

@@ -45,16 +45,14 @@ export default function Home() {
 
   return (
     <>
-      <div className="pt-24 pb-16">
+      <div className="pt-28 pb-16">
         {/* Hero Section */}
         <section className="px-4 mb-16">
           <div className="max-w-7xl mx-auto">
             <div 
               className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-charcoal to-charcoal-dark border border-gold/20 mb-16"
               style={{
-                backgroundImage: `linear-gradient(rgba(18, 38, 32, 0.9), rgba(18, 38, 32, 0.9)), url('https://images.unsplash.com/photo-1611162617474-5b21e879e113?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2000&h=1200')`,
-                backgroundSize: "cover",
-                backgroundPosition: "center"
+                background: `linear-gradient(135deg, rgba(18, 38, 32, 0.95), rgba(28, 45, 36, 0.95)), linear-gradient(45deg, rgba(214, 173, 96, 0.1), rgba(214, 173, 96, 0.05))`,
               }}
             >
               <div className="px-8 py-16 md:px-16 md:py-24 text-center">

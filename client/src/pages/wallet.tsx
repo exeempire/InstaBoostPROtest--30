@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { usePaymentStatus } from "@/hooks/use-payment-status";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -16,6 +17,9 @@ interface Order {
 
 export default function Wallet() {
   const { user } = useAuth();
+  
+  // Monitor payment status for real-time notifications
+  usePaymentStatus();
 
   const { data: orders = [] } = useQuery<Order[]>({
     queryKey: ["/api/orders"],

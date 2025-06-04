@@ -31,8 +31,12 @@ export function Navbar() {
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-gold to-tan rounded-lg flex items-center justify-center">
-                <i className="fas fa-rocket text-charcoal text-lg"></i>
+              <div className="w-10 h-10 bg-gradient-to-br from-gold to-tan rounded-lg flex items-center justify-center shadow-lg">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-charcoal">
+                  <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor"/>
+                  <path d="M19.5 14.5L20.5 17.5L23.5 18.5L20.5 19.5L19.5 22.5L18.5 19.5L15.5 18.5L18.5 17.5L19.5 14.5Z" fill="currentColor"/>
+                  <path d="M4.5 1.5L5.5 4.5L8.5 5.5L5.5 6.5L4.5 9.5L3.5 6.5L0.5 5.5L3.5 4.5L4.5 1.5Z" fill="currentColor"/>
+                </svg>
               </div>
               <span className="text-gold font-bold text-xl">InstaBoost Pro</span>
             </Link>

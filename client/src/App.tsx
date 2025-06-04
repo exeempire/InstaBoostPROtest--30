@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
 import Home from "@/pages/home";
 import Services from "@/pages/services";
 import Wallet from "@/pages/wallet";
@@ -32,9 +33,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="min-h-screen" style={{ backgroundColor: 'var(--main-bg)' }}>
+        <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--main-bg)' }}>
           <Navbar />
-          <Router />
+          <main className="flex-1">
+            <Router />
+          </main>
+          <Footer />
           <Toaster />
         </div>
       </TooltipProvider>

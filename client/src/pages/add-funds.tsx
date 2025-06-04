@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 import {
   Form,
   FormControl,
@@ -32,8 +33,15 @@ const paymentSchema = z.object({
 type PaymentForm = z.infer<typeof paymentSchema>;
 
 export default function AddFunds() {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
+
+  // Redirect to home if not authenticated
+  if (!isAuthenticated) {
+    setLocation("/");
+    return null;
+  }
 
   const form = useForm<PaymentForm>({
     resolver: zodResolver(paymentSchema),
@@ -83,7 +91,7 @@ export default function AddFunds() {
             <h2 className="text-2xl font-bold text-gold mb-6">Scan QR Code to Pay</h2>
             <div className="inline-block p-4 bg-white rounded-xl">
               <img 
-                src="https://files.catbox.moe/gal4eh.jpg" 
+                src="https://files.catbox.moe/me72qp.jpg" 
                 alt="UPI QR Code for payment" 
                 className="w-48 h-48 object-contain"
               />

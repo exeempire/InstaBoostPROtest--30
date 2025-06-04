@@ -25,6 +25,33 @@ export default function Services() {
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
+  // Show auth modal immediately if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen pt-20 pb-8" style={{ backgroundColor: 'var(--main-bg)' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center py-20">
+            <div className="mb-8">
+              <i className="fas fa-lock text-gold text-6xl mb-6"></i>
+              <h1 className="text-4xl font-bold text-gold mb-4">Authentication Required</h1>
+              <p className="text-xl text-cream/70 mb-8">Please login with your Instagram account to access our services</p>
+              <button
+                onClick={() => setIsAuthModalOpen(true)}
+                className="btn-primary px-8 py-3 text-lg"
+              >
+                Login Now
+              </button>
+            </div>
+          </div>
+        </div>
+        <AuthModal 
+          isOpen={isAuthModalOpen} 
+          onClose={() => setIsAuthModalOpen(false)} 
+        />
+      </div>
+    );
+  }
+
   const { data: services = [] } = useQuery<Service[]>({
     queryKey: ["/api/services"],
   });

@@ -1,7 +1,7 @@
-import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "./use-toast";
 import { useAuth } from "./use-auth";
+import { useEffect } from "react";
 
 interface Payment {
   id: number;
@@ -13,43 +13,44 @@ interface Payment {
   createdAt: string;
 }
 
+// Track processed payments globally to avoid re-notifications
+const processedPayments = new Set<string>();
+
 export function usePaymentStatus() {
   const { toast } = useToast();
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
 
   const { data: payments = [] } = useQuery<Payment[]>({
     queryKey: ["/api/payments"],
     enabled: isAuthenticated,
-    refetchInterval: 5000, // Check every 5 seconds for status updates
+    refetchInterval: 2000, // Check every 2 seconds for faster updates
   });
 
   useEffect(() => {
-    if (!payments.length) return;
-
-    // Check for recently updated payments
-    const recentPayments = payments.filter(payment => {
-      const createdAt = new Date(payment.createdAt);
-      const timeDiff = Date.now() - createdAt.getTime();
-      return timeDiff < 60000; // Within last minute
-    });
-
-    recentPayments.forEach(payment => {
+    payments.forEach(payment => {
+      const paymentKey = `${payment.id}-${payment.status}`;
+      
+      if (processedPayments.has(paymentKey)) return;
+      
       if (payment.status === "Approved") {
         toast({
           title: "Payment Approved!",
           description: `₹${payment.amount} has been added to your wallet successfully.`,
-          variant: "default",
         });
+        // Refresh user data to update wallet balance
+        queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+        processedPayments.add(paymentKey);
       } else if (payment.status === "Declined") {
         toast({
           title: "Payment Failed",
           description: "Your payment transaction has been declined. Please try again or contact support.",
           variant: "destructive",
         });
+        processedPayments.add(paymentKey);
       }
     });
-  }, [payments, toast]);
+  }, [payments, toast, queryClient]);
 
   return { payments };
 }

@@ -170,7 +170,11 @@ export default function Home() {
 
       <AuthModal 
         isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)} 
+        onClose={() => {
+          setIsAuthModalOpen(false);
+          setIsFromBonus(false);
+        }}
+        isFromBonus={isFromBonus}
       />
     </>
   );

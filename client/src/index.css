@@ -5,31 +5,38 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --charcoal-dark: 14 29 24; /* #0e1d18 */
-  --charcoal: 18 38 32; /* #122620 */
-  --gold: 214 173 96; /* #d6ad60 */
-  --tan: 182 141 64; /* #b68d40 */
-  --cream: 244 235 208; /* #f4ebd0 */
+  /* Exact theme colors */
+  --main-bg: #0e1d18;
+  --card-bg: #1c2d24;
+  --navbar-bg: #122620;
+  --footer-bg: #122620;
+  --primary-text: #f4ebd0;
+  --muted-text: #cccccc;
+  --gold: #d6ad60;
+  --success-green: #3ccf4e;
+  --error-red: #f44336;
+  --input-placeholder: #999999;
   
-  --background: var(--charcoal-dark);
-  --foreground: var(--cream);
-  --muted: 18 38 32;
-  --muted-foreground: 244 235 208 / 0.7;
-  --popover: var(--charcoal);
-  --popover-foreground: var(--cream);
-  --card: var(--charcoal);
-  --card-foreground: var(--cream);
-  --border: 214 173 96 / 0.2;
-  --input: 214 173 96 / 0.2;
-  --primary: var(--gold);
-  --primary-foreground: var(--charcoal);
-  --secondary: var(--charcoal);
-  --secondary-foreground: var(--cream);
-  --accent: var(--charcoal);
-  --accent-foreground: var(--cream);
-  --destructive: 0 84% 60%;
-  --destructive-foreground: var(--cream);
-  --ring: var(--gold);
+  /* Tailwind variables */
+  --background: 14 29 24; /* #0e1d18 */
+  --foreground: 244 235 208; /* #f4ebd0 */
+  --card: 28 45 36; /* #1c2d24 */
+  --card-foreground: 244 235 208; /* #f4ebd0 */
+  --popover: 28 45 36; /* #1c2d24 */
+  --popover-foreground: 244 235 208; /* #f4ebd0 */
+  --primary: 214 173 96; /* #d6ad60 */
+  --primary-foreground: 18 38 32; /* #122620 */
+  --secondary: 28 45 36; /* #1c2d24 */
+  --secondary-foreground: 244 235 208; /* #f4ebd0 */
+  --muted: 18 38 32; /* #122620 */
+  --muted-foreground: 204 204 204; /* #cccccc */
+  --accent: 28 45 36; /* #1c2d24 */
+  --accent-foreground: 244 235 208; /* #f4ebd0 */
+  --destructive: 244 67 54; /* #f44336 */
+  --destructive-foreground: 244 235 208; /* #f4ebd0 */
+  --border: 214 173 96; /* #d6ad60 */
+  --input: 14 29 24; /* #0e1d18 */
+  --ring: 214 173 96; /* #d6ad60 */
   --radius: 1rem;
 }
 
@@ -40,8 +47,8 @@
 
   body {
     @apply font-sans antialiased;
-    background-color: hsl(var(--charcoal-dark));
-    color: hsl(var(--cream));
+    background-color: var(--main-bg);
+    color: var(--primary-text);
     font-family: 'Poppins', sans-serif;
   }
 }

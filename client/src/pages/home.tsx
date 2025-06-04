@@ -10,9 +10,11 @@ export default function Home() {
   const claimBonus = useClaimBonus();
   const { toast } = useToast();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isFromBonus, setIsFromBonus] = useState(false);
 
   const handleClaimBonus = async () => {
     if (!isAuthenticated) {
+      setIsFromBonus(true);
       setIsAuthModalOpen(true);
       return;
     }
@@ -92,7 +94,10 @@ export default function Home() {
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                   <Button 
-                    onClick={() => setIsAuthModalOpen(true)}
+                    onClick={() => {
+                      setIsFromBonus(false);
+                      setIsAuthModalOpen(true);
+                    }}
                     className="btn-primary hover:scale-105 transition-all duration-300"
                   >
                     <i className="fas fa-rocket mr-2"></i>Get Started Free

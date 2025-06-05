@@ -12,12 +12,16 @@ services:
         fromDatabase:
           name: smm-panel-db
           property: connectionString
+      - key: JWT_SECRET
+        value: SomeVeryStrongRandomSecret
       - key: SESSION_SECRET
-        generateValue: true
+        value: SomeVeryStrongRandomSecret
       - key: TELEGRAM_BOT_TOKEN
-        sync: false
+        value: "7275717734:AAE6bq0Mdypn_wQL6F1wpphzEtLAco3_B3Y"
       - key: TELEGRAM_CHAT_ID
-        sync: false
+        value: "6881713177"
+      - key: PORT
+        value: "3000"
 
 databases:
   - name: smm-panel-db

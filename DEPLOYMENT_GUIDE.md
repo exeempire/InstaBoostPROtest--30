@@ -44,13 +44,11 @@ Dashboard me "Environment" tab me jaiye aur ye variables add kariye:
 
 ```
 NODE_ENV = production
-SESSION_SECRET = [random-32-character-string]
-```
-
-#### Optional (Telegram ke liye):
-```
-TELEGRAM_BOT_TOKEN = [aapka-bot-token]
-TELEGRAM_CHAT_ID = [aapka-chat-id]
+JWT_SECRET = SomeVeryStrongRandomSecret
+SESSION_SECRET = SomeVeryStrongRandomSecret
+TELEGRAM_BOT_TOKEN = 7275717734:AAE6bq0Mdypn_wQL6F1wpphzEtLAco3_B3Y
+TELEGRAM_CHAT_ID = 6881713177
+PORT = 3000
 ```
 
 ## Step 5: Database Setup

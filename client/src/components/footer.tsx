@@ -128,8 +128,8 @@ export function Footer() {
 
         {/* Bottom Section */}
         <div className="border-t border-gold/20 mt-8 pt-8">
-          <div className="flex justify-center items-center">
-            <div className="flex items-center space-x-6 text-sm">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex items-center space-x-6 text-sm mb-4 md:mb-0">
               <div className="text-cream/60">
                 <i className="fas fa-shield-alt text-gold mr-2"></i>
                 SSL Secured
@@ -142,6 +142,9 @@ export function Footer() {
                 <i className="fas fa-award text-gold mr-2"></i>
                 Premium Quality
               </div>
+            </div>
+            <div className="text-cream/60 text-sm">
+              © {currentYear} InstaBoost Pro. All rights reserved.
             </div>
           </div>
         </div>

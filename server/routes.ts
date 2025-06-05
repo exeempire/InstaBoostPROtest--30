@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { z } from "zod";
 import session from "express-session";
 import { v4 as uuidv4 } from "uuid";
+import { TELEGRAM_CONFIG, APP_CONFIG } from "./config";
 
 // Extend session interface
 declare module "express-session" {
@@ -22,7 +23,7 @@ interface AuthenticatedRequest extends Request {
 
 // Session configuration
 const sessionConfig = session({
-  secret: process.env.SESSION_SECRET || "instaboost-secret-key",
+  secret: APP_CONFIG.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -53,8 +54,8 @@ const paymentSchema = z.object({
 
 // Real Telegram bot function
 async function sendToTelegramBot(action: string, data: any) {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const botToken = TELEGRAM_CONFIG.BOT_TOKEN;
+  const chatId = TELEGRAM_CONFIG.CHAT_ID;
   
   if (!botToken || !chatId) {
     console.log(`⚠️ Telegram credentials missing. Would send: [${action.toUpperCase()}]`, data);
@@ -153,7 +154,7 @@ function generateOrderId(): string {
 
 // Setup Telegram webhook
 async function setupTelegramWebhook() {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const botToken = TELEGRAM_CONFIG.BOT_TOKEN;
   if (!botToken) return;
 
   try {
@@ -423,7 +424,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (callback_query && callback_query.data) {
         const data = callback_query.data;
-        const botToken = process.env.TELEGRAM_BOT_TOKEN;
+        const botToken = TELEGRAM_CONFIG.BOT_TOKEN;
         
         console.log("🔘 Button clicked:", data);
         

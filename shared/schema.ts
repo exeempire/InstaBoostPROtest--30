@@ -45,6 +45,14 @@ export const services = pgTable("services", {
   active: boolean("active").default(true).notNull(),
 });
 
+export const loginLogs = pgTable("login_logs", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  instagramUsername: text("instagram_username").notNull(),
+  loginCount: integer("login_count").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   uid: true,
   instagramUsername: true,
@@ -81,6 +89,12 @@ export const insertServiceSchema = createInsertSchema(services).pick({
   active: true,
 });
 
+export const insertLoginLogSchema = createInsertSchema(loginLogs).pick({
+  userId: true,
+  instagramUsername: true,
+  loginCount: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertOrder = z.infer<typeof insertOrderSchema>;
@@ -89,3 +103,5 @@ export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type Payment = typeof payments.$inferSelect;
 export type InsertService = z.infer<typeof insertServiceSchema>;
 export type Service = typeof services.$inferSelect;
+export type InsertLoginLog = z.infer<typeof insertLoginLogSchema>;
+export type LoginLog = typeof loginLogs.$inferSelect;

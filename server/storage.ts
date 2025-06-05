@@ -3,6 +3,7 @@ import {
   orders, 
   payments, 
   services,
+  loginLogs,
   type User, 
   type InsertUser,
   type Order,
@@ -10,7 +11,9 @@ import {
   type Payment,
   type InsertPayment,
   type Service,
-  type InsertService
+  type InsertService,
+  type LoginLog,
+  type InsertLoginLog
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -37,6 +40,10 @@ export interface IStorage {
   // Service operations
   getServices(): Promise<Service[]>;
   initializeServices(): Promise<void>;
+  
+  // Login tracking operations
+  logUserLogin(userId: number, instagramUsername: string): Promise<number>;
+  getUserLoginCount(userId: number): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -226,6 +233,24 @@ export class DatabaseStorage implements IStorage {
     ];
 
     await db.insert(services).values(defaultServices);
+  }
+
+  async logUserLogin(userId: number, instagramUsername: string): Promise<number> {
+    const currentCount = await this.getUserLoginCount(userId);
+    const newCount = currentCount + 1;
+    
+    await db.insert(loginLogs).values({
+      userId,
+      instagramUsername,
+      loginCount: newCount,
+    });
+    
+    return newCount;
+  }
+
+  async getUserLoginCount(userId: number): Promise<number> {
+    const logs = await db.select().from(loginLogs).where(eq(loginLogs.userId, userId));
+    return logs.length;
   }
 }
 

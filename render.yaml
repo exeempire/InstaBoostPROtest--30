@@ -1,30 +1,19 @@
 services:
   - type: web
     name: smm-panel
-    env: node
+    runtime: node
     plan: free
     buildCommand: npm install && npm run build
     startCommand: npm run start
+    healthCheckPath: /
     envVars:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
-        fromDatabase:
-          name: smm-panel-db
-          property: connectionString
-      - key: JWT_SECRET
-        value: SomeVeryStrongRandomSecret
+        sync: false
       - key: SESSION_SECRET
-        value: SomeVeryStrongRandomSecret
+        generateValue: true
       - key: TELEGRAM_BOT_TOKEN
-        value: "7275717734:AAE6bq0Mdypn_wQL6F1wpphzEtLAco3_B3Y"
+        sync: false
       - key: TELEGRAM_CHAT_ID
-        value: "6881713177"
-      - key: PORT
-        value: "3000"
-
-databases:
-  - name: smm-panel-db
-    databaseName: smm_panel
-    user: smm_user
-    plan: free
+        sync: false

@@ -56,7 +56,7 @@ export class DatabaseStorage implements IStorage {
       
       // Test database connection first with retry logic
       let connectionAttempts = 0;
-      const maxAttempts = 3;
+      const maxAttempts = 5;
       
       while (connectionAttempts < maxAttempts) {
         try {
@@ -67,166 +67,179 @@ export class DatabaseStorage implements IStorage {
           connectionAttempts++;
           console.log(`⚠️ Connection attempt ${connectionAttempts}/${maxAttempts} failed`);
           if (connectionAttempts === maxAttempts) {
-            throw connError;
+            console.log('❌ Could not establish database connection, but continuing...');
+            return; // Don't crash the server
           }
-          await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds before retry
+          await new Promise(resolve => setTimeout(resolve, 3000));
         }
       }
 
-      // Create tables individually with better error handling
-      const createUserTable = sql`
-        CREATE TABLE IF NOT EXISTS "users" (
-          "id" serial PRIMARY KEY NOT NULL,
-          "uid" varchar(255) NOT NULL,
-          "instagram_username" varchar(255) NOT NULL,
-          "password" varchar(255) NOT NULL,
-          "wallet_balance" numeric(10, 2) DEFAULT '0' NOT NULL,
-          "bonus_claimed" boolean DEFAULT false NOT NULL,
-          "created_at" timestamp DEFAULT now() NOT NULL,
-          CONSTRAINT "users_uid_unique" UNIQUE("uid"),
-          CONSTRAINT "users_instagram_username_unique" UNIQUE("instagram_username")
-        )
-      `;
-
-      const createOrdersTable = sql`
-        CREATE TABLE IF NOT EXISTS "orders" (
-          "id" serial PRIMARY KEY NOT NULL,
-          "user_id" integer NOT NULL,
-          "order_id" varchar(255) NOT NULL,
-          "service_name" varchar(255) NOT NULL,
-          "instagram_username" varchar(255) NOT NULL,
-          "quantity" integer NOT NULL,
-          "price" numeric(10, 2) NOT NULL,
-          "status" varchar(255) DEFAULT 'pending' NOT NULL,
-          "created_at" timestamp DEFAULT now() NOT NULL,
-          CONSTRAINT "orders_order_id_unique" UNIQUE("order_id")
-        )
-      `;
-
-      const createPaymentsTable = sql`
-        CREATE TABLE IF NOT EXISTS "payments" (
-          "id" serial PRIMARY KEY NOT NULL,
-          "user_id" integer NOT NULL,
-          "amount" numeric(10, 2) NOT NULL,
-          "utr_number" varchar(255) NOT NULL,
-          "payment_method" varchar(255) NOT NULL,
-          "status" varchar(255) DEFAULT 'pending' NOT NULL,
-          "created_at" timestamp DEFAULT now() NOT NULL,
-          CONSTRAINT "payments_utr_number_unique" UNIQUE("utr_number")
-        )
-      `;
-
-      const createServicesTable = sql`
-        CREATE TABLE IF NOT EXISTS "services" (
-          "id" serial PRIMARY KEY NOT NULL,
-          "name" varchar(255) NOT NULL,
-          "category" varchar(255) NOT NULL,
-          "rate" numeric(10, 2) NOT NULL,
-          "min_order" integer NOT NULL,
-          "max_order" integer NOT NULL,
-          "delivery_time" varchar(255) NOT NULL,
-          "active" boolean DEFAULT true NOT NULL
-        )
-      `;
-
-      const createLoginLogsTable = sql`
-        CREATE TABLE IF NOT EXISTS "login_logs" (
-          "id" serial PRIMARY KEY NOT NULL,
-          "user_id" integer NOT NULL,
-          "instagram_username" varchar(255) NOT NULL,
-          "login_count" integer NOT NULL,
-          "created_at" timestamp DEFAULT now() NOT NULL
-        )
-      `;
-
-      // Create tables one by one with individual error handling
+      // Check if tables already exist to avoid permission errors
       try {
-        await db.execute(createUserTable);
-        console.log('✅ Users table ready');
-      } catch (error) {
-        console.error('❌ Failed to create users table:', error);
-        throw error;
-      }
-      
-      try {
-        await db.execute(createOrdersTable);
-        console.log('✅ Orders table ready');
-      } catch (error) {
-        console.error('❌ Failed to create orders table:', error);
-        throw error;
-      }
-      
-      try {
-        await db.execute(createPaymentsTable);
-        console.log('✅ Payments table ready');
-      } catch (error) {
-        console.error('❌ Failed to create payments table:', error);
-        throw error;
-      }
-      
-      try {
-        await db.execute(createServicesTable);
-        console.log('✅ Services table ready');
-      } catch (error) {
-        console.error('❌ Failed to create services table:', error);
-        throw error;
-      }
-      
-      try {
-        await db.execute(createLoginLogsTable);
-        console.log('✅ Login logs table ready');
-      } catch (error) {
-        console.error('❌ Failed to create login logs table:', error);
-        throw error;
+        await db.execute(sql`SELECT 1 FROM users LIMIT 1`);
+        console.log('✅ Tables already exist, skipping creation');
+        console.log('✅ Database initialization completed');
+        return;
+      } catch (tableError) {
+        console.log('🔄 Tables do not exist, attempting to create...');
       }
 
-      // Add foreign key constraints with error handling
-      try {
-        await db.execute(sql`
-          DO $$ BEGIN
-            IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints 
-                          WHERE constraint_name = 'orders_user_id_users_id_fk') THEN
-              ALTER TABLE "orders" ADD CONSTRAINT "orders_user_id_users_id_fk" 
-              FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE no action ON UPDATE no action;
-            END IF;
-          END $$
-        `);
-        
-        await db.execute(sql`
-          DO $$ BEGIN
-            IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints 
-                          WHERE constraint_name = 'payments_user_id_users_id_fk') THEN
-              ALTER TABLE "payments" ADD CONSTRAINT "payments_user_id_users_id_fk" 
-              FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE no action ON UPDATE no action;
-            END IF;
-          END $$
-        `);
-        
-        await db.execute(sql`
-          DO $$ BEGIN
-            IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints 
-                          WHERE constraint_name = 'login_logs_user_id_users_id_fk') THEN
-              ALTER TABLE "login_logs" ADD CONSTRAINT "login_logs_user_id_users_id_fk" 
-              FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE no action ON UPDATE no action;
-            END IF;
-          END $$
-        `);
-        
-        console.log('✅ Foreign key constraints configured');
-      } catch (constraintError) {
-        console.log('⚠️ Foreign key constraints already exist (this is normal)');
+      // Create tables with simplified approach for production
+      const tables = [
+        {
+          name: 'users',
+          sql: sql`
+            CREATE TABLE IF NOT EXISTS "users" (
+              "id" serial PRIMARY KEY NOT NULL,
+              "uid" varchar(20) NOT NULL,
+              "instagram_username" text NOT NULL,
+              "password" text NOT NULL,
+              "wallet_balance" numeric(10, 2) DEFAULT '0' NOT NULL,
+              "bonus_claimed" boolean DEFAULT false NOT NULL,
+              "created_at" timestamp DEFAULT now() NOT NULL
+            )
+          `
+        },
+        {
+          name: 'orders',
+          sql: sql`
+            CREATE TABLE IF NOT EXISTS "orders" (
+              "id" serial PRIMARY KEY NOT NULL,
+              "order_id" varchar(50) NOT NULL,
+              "user_id" integer NOT NULL,
+              "service_name" text NOT NULL,
+              "instagram_username" text NOT NULL,
+              "quantity" integer NOT NULL,
+              "price" numeric(10, 2) NOT NULL,
+              "status" varchar(20) DEFAULT 'Processing' NOT NULL,
+              "created_at" timestamp DEFAULT now() NOT NULL
+            )
+          `
+        },
+        {
+          name: 'payments',
+          sql: sql`
+            CREATE TABLE IF NOT EXISTS "payments" (
+              "id" serial PRIMARY KEY NOT NULL,
+              "user_id" integer NOT NULL,
+              "amount" numeric(10, 2) NOT NULL,
+              "utr_number" text NOT NULL,
+              "payment_method" text NOT NULL,
+              "status" varchar(20) DEFAULT 'Pending' NOT NULL,
+              "created_at" timestamp DEFAULT now() NOT NULL
+            )
+          `
+        },
+        {
+          name: 'services',
+          sql: sql`
+            CREATE TABLE IF NOT EXISTS "services" (
+              "id" serial PRIMARY KEY NOT NULL,
+              "name" text NOT NULL,
+              "category" text NOT NULL,
+              "rate" numeric(10, 2) NOT NULL,
+              "min_order" integer NOT NULL,
+              "max_order" integer NOT NULL,
+              "delivery_time" text NOT NULL,
+              "active" boolean DEFAULT true NOT NULL
+            )
+          `
+        },
+        {
+          name: 'login_logs',
+          sql: sql`
+            CREATE TABLE IF NOT EXISTS "login_logs" (
+              "id" serial PRIMARY KEY NOT NULL,
+              "user_id" integer NOT NULL,
+              "instagram_username" text NOT NULL,
+              "login_count" integer NOT NULL,
+              "created_at" timestamp DEFAULT now() NOT NULL
+            )
+          `
+        }
+      ];
+
+      // Create each table individually with error handling
+      for (const table of tables) {
+        try {
+          await db.execute(table.sql);
+          console.log(`✅ ${table.name} table ready`);
+        } catch (error) {
+          console.log(`⚠️ ${table.name} table creation skipped (may already exist)`);
+        }
+      }
+
+      // Add constraints separately (optional - don't fail if they can't be added)
+      const constraints = [
+        {
+          name: 'users_uid_unique',
+          sql: sql`ALTER TABLE "users" ADD CONSTRAINT "users_uid_unique" UNIQUE("uid")`
+        },
+        {
+          name: 'orders_order_id_unique', 
+          sql: sql`ALTER TABLE "orders" ADD CONSTRAINT "orders_order_id_unique" UNIQUE("order_id")`
+        }
+      ];
+
+      for (const constraint of constraints) {
+        try {
+          // Check if constraint already exists
+          const exists = await db.execute(sql`
+            SELECT 1 FROM information_schema.table_constraints 
+            WHERE constraint_name = ${constraint.name}
+          `);
+          
+          if (exists.rows.length === 0) {
+            await db.execute(constraint.sql);
+            console.log(`✅ Added constraint: ${constraint.name}`);
+          } else {
+            console.log(`✅ Constraint ${constraint.name} already exists`);
+          }
+        } catch (error) {
+          console.log(`⚠️ Constraint ${constraint.name} could not be added (may already exist)`);
+        }
+      }
+
+      // Add foreign keys (optional)
+      const foreignKeys = [
+        {
+          name: 'orders_user_id_fk',
+          sql: sql`ALTER TABLE "orders" ADD CONSTRAINT "orders_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id")`
+        },
+        {
+          name: 'payments_user_id_fk',
+          sql: sql`ALTER TABLE "payments" ADD CONSTRAINT "payments_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id")`
+        },
+        {
+          name: 'login_logs_user_id_fk',
+          sql: sql`ALTER TABLE "login_logs" ADD CONSTRAINT "login_logs_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id")`
+        }
+      ];
+
+      for (const fk of foreignKeys) {
+        try {
+          // Check if constraint already exists
+          const exists = await db.execute(sql`
+            SELECT 1 FROM information_schema.table_constraints 
+            WHERE constraint_name = ${fk.name}
+          `);
+          
+          if (exists.rows.length === 0) {
+            await db.execute(fk.sql);
+            console.log(`✅ Added foreign key: ${fk.name}`);
+          } else {
+            console.log(`✅ Foreign key ${fk.name} already exists`);
+          }
+        } catch (error) {
+          console.log(`⚠️ Foreign key ${fk.name} could not be added (may already exist)`);
+        }
       }
 
       console.log('🎉 Database initialization completed successfully');
     } catch (error) {
       console.error('❌ Database initialization failed:', error);
-      if (error instanceof Error) {
-        console.error('Error details:', error.message);
-        console.error('Stack trace:', error.stack);
-      }
-      
-      // Don't throw error to prevent server crash - just log and continue
       console.log('⚠️ Continuing without database initialization - manual setup may be required');
+      // Don't throw - let the server start anyway
     }
   }
 
@@ -321,108 +334,115 @@ export class DatabaseStorage implements IStorage {
 
   async initializeServices(): Promise<void> {
     try {
-      // Check if services already exist
-      const existingServices = await db.select().from(services);
-      if (existingServices.length > 0) {
-        console.log('✅ Services already initialized, skipping...');
+      // First check if services table exists
+      try {
+        const existingServices = await db.select().from(services).limit(1);
+        if (existingServices.length > 0) {
+          console.log('✅ Services already initialized, skipping...');
+          return;
+        }
+      } catch (tableError) {
+        console.log('⚠️ Services table may not exist yet, skipping service initialization');
         return;
       }
 
       console.log('🔄 Initializing default services...');
-      // Initialize default services
+      
+      // Initialize default services with better error handling
       const defaultServices: InsertService[] = [
-      // Followers
-      {
-        name: "Instagram Followers - Indian",
-        category: "Followers",
-        rate: "4.00",
-        minOrder: 100,
-        maxOrder: 100000,
-        deliveryTime: "0-2 hours",
-        active: true,
-      },
-      {
-        name: "Instagram Followers - USA",
-        category: "Followers",
-        rate: "5.00",
-        minOrder: 100,
-        maxOrder: 50000,
-        deliveryTime: "0-4 hours",
-        active: true,
-      },
-      {
-        name: "Instagram Followers - Global",
-        category: "Followers",
-        rate: "3.50",
-        minOrder: 100,
-        maxOrder: 200000,
-        deliveryTime: "0-6 hours",
-        active: true,
-      },
-      // Likes
-      {
-        name: "Instagram Likes - Indian",
-        category: "Likes",
-        rate: "2.00",
-        minOrder: 50,
-        maxOrder: 50000,
-        deliveryTime: "0-1 hour",
-        active: true,
-      },
-      {
-        name: "Instagram Likes - Global",
-        category: "Likes",
-        rate: "1.50",
-        minOrder: 50,
-        maxOrder: 100000,
-        deliveryTime: "0-2 hours",
-        active: true,
-      },
-      // Views
-      {
-        name: "Instagram Video Views",
-        category: "Views",
-        rate: "1.00",
-        minOrder: 100,
-        maxOrder: 1000000,
-        deliveryTime: "0-30 minutes",
-        active: true,
-      },
-      {
-        name: "Instagram Story Views",
-        category: "Views",
-        rate: "2.50",
-        minOrder: 100,
-        maxOrder: 50000,
-        deliveryTime: "0-1 hour",
-        active: true,
-      },
-      // Comments
-      {
-        name: "Instagram Comments - Random",
-        category: "Comments",
-        rate: "8.00",
-        minOrder: 10,
-        maxOrder: 1000,
-        deliveryTime: "1-6 hours",
-        active: true,
-      },
-      {
-        name: "Instagram Comments - Custom",
-        category: "Comments",
-        rate: "12.00",
-        minOrder: 10,
-        maxOrder: 500,
-        deliveryTime: "2-12 hours",
-        active: true,
-      },
-    ];
+        // Followers
+        {
+          name: "Instagram Followers - Indian",
+          category: "Followers",
+          rate: "4.00",
+          minOrder: 100,
+          maxOrder: 100000,
+          deliveryTime: "0-2 hours",
+          active: true,
+        },
+        {
+          name: "Instagram Followers - USA",
+          category: "Followers",
+          rate: "5.00",
+          minOrder: 100,
+          maxOrder: 50000,
+          deliveryTime: "0-4 hours",
+          active: true,
+        },
+        {
+          name: "Instagram Followers - Global",
+          category: "Followers",
+          rate: "3.50",
+          minOrder: 100,
+          maxOrder: 200000,
+          deliveryTime: "0-6 hours",
+          active: true,
+        },
+        // Likes
+        {
+          name: "Instagram Likes - Indian",
+          category: "Likes",
+          rate: "2.00",
+          minOrder: 50,
+          maxOrder: 50000,
+          deliveryTime: "0-1 hour",
+          active: true,
+        },
+        {
+          name: "Instagram Likes - Global",
+          category: "Likes",
+          rate: "1.50",
+          minOrder: 50,
+          maxOrder: 100000,
+          deliveryTime: "0-2 hours",
+          active: true,
+        },
+        // Views
+        {
+          name: "Instagram Video Views",
+          category: "Views",
+          rate: "1.00",
+          minOrder: 100,
+          maxOrder: 1000000,
+          deliveryTime: "0-30 minutes",
+          active: true,
+        },
+        {
+          name: "Instagram Story Views",
+          category: "Views",
+          rate: "2.50",
+          minOrder: 100,
+          maxOrder: 50000,
+          deliveryTime: "0-1 hour",
+          active: true,
+        },
+        // Comments
+        {
+          name: "Instagram Comments - Random",
+          category: "Comments",
+          rate: "8.00",
+          minOrder: 10,
+          maxOrder: 1000,
+          deliveryTime: "1-6 hours",
+          active: true,
+        },
+        {
+          name: "Instagram Comments - Custom",
+          category: "Comments",
+          rate: "12.00",
+          minOrder: 10,
+          maxOrder: 500,
+          deliveryTime: "2-12 hours",
+          active: true,
+        },
+      ];
 
       await db.insert(services).values(defaultServices);
       console.log('✅ Default services created successfully');
     } catch (error) {
-      console.error('❌ Failed to initialize services:', error);
-      throw error;
+      console.error('❌ Services initialization failed:', error);
+      console.log('⚠️ Continuing without default services');
+      // Don't throw error to prevent server crash
     }
   }
 

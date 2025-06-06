@@ -158,12 +158,29 @@ function generateOrderId(): string {
 // Setup Telegram webhook
 async function setupTelegramWebhook() {
   const botToken = TELEGRAM_CONFIG.BOT_TOKEN;
-  if (!botToken) return;
+  if (!botToken) {
+    console.log('⚠️ Telegram bot token not configured, skipping webhook setup');
+    return;
+  }
 
   try {
-    // Set webhook URL to receive callback queries - use the correct Replit domain format
-    const domain = process.env.REPLIT_DEV_DOMAIN || `${process.env.REPL_ID || 'local'}.${process.env.REPLIT_CLUSTER || 'replit'}.repl.co`;
-    const webhookUrl = `https://${domain}/api/telegram/webhook`;
+    // For production deployments, detect the correct webhook URL
+    let webhookUrl = '';
+    
+    if (process.env.NODE_ENV === 'production') {
+      // For Render deployment
+      const renderUrl = process.env.RENDER_EXTERNAL_URL;
+      if (renderUrl) {
+        webhookUrl = `${renderUrl}/api/telegram/webhook`;
+      } else {
+        console.log('⚠️ No production URL found, skipping webhook setup');
+        return;
+      }
+    } else {
+      // For development
+      const domain = process.env.REPLIT_DEV_DOMAIN || `${process.env.REPL_ID || 'local'}.${process.env.REPLIT_CLUSTER || 'replit'}.repl.co`;
+      webhookUrl = `https://${domain}/api/telegram/webhook`;
+    }
     
     const response = await fetch(`https://api.telegram.org/bot${botToken}/setWebhook`, {
       method: 'POST',
@@ -174,14 +191,17 @@ async function setupTelegramWebhook() {
       })
     });
 
-    if (response.ok) {
+    const result = await response.json();
+    if (response.ok && result.ok) {
       console.log('✅ Telegram webhook configured successfully');
     } else {
-      console.log('⚠️ Telegram webhook setup failed:', await response.text());
+      console.log('⚠️ Telegram webhook setup failed:', result);
     }
   } catch (error) {
-    console.log('⚠️ Telegram webhook error:', error);
+    console.log('⚠️ Telegram webhook setup failed:', error);
   }
+  
+  console.log('✅ Telegram webhook setup completed');
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {

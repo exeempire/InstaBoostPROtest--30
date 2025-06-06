@@ -10,19 +10,23 @@ neonConfig.useSecureWebSocket = true;
 neonConfig.poolQueryViaFetch = true;
 
 if (!process.env.DATABASE_URL) {
-  console.error("❌ DATABASE_URL environment variable is missing!");
-  console.error("Please set DATABASE_URL in your Render environment variables.");
-  console.error("Example: postgres://user:pass@host:5432/database");
-  process.exit(1);
+  if (process.env.NODE_ENV === 'production') {
+    console.error("❌ DATABASE_URL environment variable is required in production!");
+    console.error("Please set DATABASE_URL in your Render environment variables.");
+    console.error("Example: postgres://user:pass@host:5432/database");
+    process.exit(1);
+  } else {
+    console.warn("⚠️ DATABASE_URL not set - using fallback for development");
+  }
 }
 
 export const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
-  max: 5,
+  connectionString: process.env.DATABASE_URL || "postgresql://localhost:5432/smm_panel_dev",
+  max: process.env.NODE_ENV === 'production' ? 10 : 5,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
+  connectionTimeoutMillis: 10000,
   maxUses: 7500,
-  allowExitOnIdle: true,
+  allowExitOnIdle: process.env.NODE_ENV !== 'production',
 });
 
 // Add error handling for pool

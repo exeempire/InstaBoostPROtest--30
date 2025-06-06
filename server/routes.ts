@@ -1,12 +1,10 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./mongo-storage";
 import { z } from "zod";
 import session from "express-session";
-import connectPgSimple from "connect-pg-simple";
 import { v4 as uuidv4 } from "uuid";
 import { TELEGRAM_CONFIG, APP_CONFIG } from "./config";
-import { pool } from "./db";
 
 // Extend session interface
 declare module "express-session" {
@@ -23,16 +21,8 @@ interface AuthenticatedRequest extends Request {
   };
 }
 
-// Create PostgreSQL session store for production
-const PgSession = connectPgSimple(session);
-
-// Session configuration with production-ready PostgreSQL store
+// Simple session configuration for MongoDB
 const sessionConfig = session({
-  store: process.env.NODE_ENV === 'production' ? new PgSession({
-    pool: pool,
-    tableName: 'session',
-    createTableIfMissing: true,
-  }) : undefined,
   secret: APP_CONFIG.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,

@@ -378,8 +378,8 @@ export class DatabaseStorage implements IStorage {
       },
     ];
 
-    await db.insert(services).values(defaultServices);
-    console.log('✅ Default services created successfully');
+      await db.insert(services).values(defaultServices);
+      console.log('✅ Default services created successfully');
     } catch (error) {
       console.error('❌ Failed to initialize services:', error);
       throw error;

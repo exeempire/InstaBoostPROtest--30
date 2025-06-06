@@ -1,0 +1,50 @@
+2025-06-06T04:49:57.682976162Z     hint: undefined,
+2025-06-06T04:49:57.682980172Z     position: '99',
+2025-06-06T04:49:57.682984492Z     internalPosition: undefined,
+2025-06-06T04:49:57.682988402Z     internalQuery: undefined,
+2025-06-06T04:49:57.682992432Z     where: undefined,
+2025-06-06T04:49:57.682996612Z     schema: undefined,
+2025-06-06T04:49:57.683000743Z     table: undefined,
+2025-06-06T04:49:57.683004583Z     column: undefined,
+2025-06-06T04:49:57.683008513Z     dataType: undefined,
+2025-06-06T04:49:57.683012503Z     constraint: undefined,
+2025-06-06T04:49:57.683016473Z     file: 'parse_relation.c',
+2025-06-06T04:49:57.683020363Z     line: '1449',
+2025-06-06T04:49:57.683024313Z     routine: 'parserOpenTable',
+2025-06-06T04:49:57.683028193Z     sourceError: undefined
+2025-06-06T04:49:57.683032053Z   }
+2025-06-06T04:49:57.683036193Z } reason: NeonDbError: relation "services" does not exist
+2025-06-06T04:49:57.683040473Z     at execute (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+2025-06-06T04:49:57.683044814Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2025-06-06T04:49:57.683048954Z   severity: 'ERROR',
+2025-06-06T04:49:57.683052924Z   code: '42P01',
+2025-06-06T04:49:57.683057174Z   detail: undefined,
+2025-06-06T04:49:57.683061184Z   hint: undefined,
+2025-06-06T04:49:57.683065264Z   position: '99',
+2025-06-06T04:49:57.683069094Z   internalPosition: undefined,
+2025-06-06T04:49:57.683073194Z   internalQuery: undefined,
+2025-06-06T04:49:57.683077174Z   where: undefined,
+2025-06-06T04:49:57.683081025Z   schema: undefined,
+2025-06-06T04:49:57.683085025Z   table: undefined,
+2025-06-06T04:49:57.683089085Z   column: undefined,
+2025-06-06T04:49:57.683093335Z   dataType: undefined,
+2025-06-06T04:49:57.683097315Z   constraint: undefined,
+2025-06-06T04:49:57.683101245Z   file: 'parse_relation.c',
+2025-06-06T04:49:57.683105235Z   line: '1449',
+2025-06-06T04:49:57.683119186Z   routine: 'parserOpenTable',
+2025-06-06T04:49:57.683122036Z   sourceError: undefined
+2025-06-06T04:49:57.683124426Z }
+2025-06-06T04:50:29.158844818Z ==> No open ports detected, continuing to scan...
+2025-06-06T04:50:29.292621536Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-06-06T04:51:30.05907299Z ==> No open ports detected, continuing to scan...
+2025-06-06T04:51:30.203350874Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-06-06T04:52:30.962943759Z ==> No open ports detected, continuing to scan...
+2025-06-06T04:52:31.039801355Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-06-06T04:53:31.759797196Z ==> No open ports detected, continuing to scan...
+2025-06-06T04:53:31.845336302Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-06-06T04:54:32.436349296Z ==> No open ports detected, continuing to scan...
+2025-06-06T04:54:32.55727167Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-06-06T04:54:47.760600841Z ==> Port scan timeout reached, no open ports detected. Bind your service to at least one port. If you don't need to receive traffic on any port, create a background worker instead.
+2025-06-06T04:54:47.852771875Z ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+2025-06-06T05:04:09.200414211Z ==> Timed out: Port scan timeout reached, no open ports detected. Bind your service to at least one port. If you don't need to receive traffic on any port, create a background worker instead.
+2025-06-06T05:04:09.21746464Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys

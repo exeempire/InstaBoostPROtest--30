@@ -563,7 +563,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             console.log("❌ Payment not found for ID:", paymentId);
           }
         } else if (data.startsWith("decline_payment_")) {
-          const paymentId = parseInt(data.replace("decline_payment_", ""));
+          const paymentId = data.replace("decline_payment_", "");
           console.log("❌ Processing payment decline for ID:", paymentId);
           
           // Update payment status to declined
@@ -645,7 +645,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin endpoints for payment approval (mock)
   app.post("/api/admin/payments/:id/approve", async (req, res) => {
     try {
-      const paymentId = parseInt(req.params.id);
+      const paymentId = req.params.id;
       const payment = await storage.getPayment(paymentId);
       
       if (!payment) {
@@ -670,7 +670,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/admin/payments/:id/decline", async (req, res) => {
     try {
-      const paymentId = parseInt(req.params.id);
+      const paymentId = req.params.id;
       await storage.updatePaymentStatus(paymentId, "Declined");
       res.json({ success: true, message: "Payment declined" });
     } catch (error) {

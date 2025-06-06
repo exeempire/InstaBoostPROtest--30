@@ -3,7 +3,7 @@ services:
     name: smm-panel
     env: node
     plan: free
-    buildCommand: npm ci && npm run build && node fix-production-db.js
+    buildCommand: npm ci && npm run build && node emergency-db-fix.js
     startCommand: npm start
     envVars:
       - key: NODE_ENV

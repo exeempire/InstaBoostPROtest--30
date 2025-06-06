@@ -72,15 +72,16 @@ export function AuthModal({ isOpen, onClose, isFromBonus = false }: AuthModalPro
           </DialogTitle>
           <DialogDescription className="text-center" style={{ color: 'var(--primary-text)' }}>
             {isFromBonus ? (
-              <div className="space-y-2">
+              <>
+                <span className="block mb-2">Login to claim your bonus</span>
                 <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-3">
-                  <p className="font-semibold text-yellow-400">
+                  <span className="font-semibold text-yellow-400">
                     ⚠️ Important: Login with the same Instagram account where you want to receive free followers!
-                  </p>
+                  </span>
                 </div>
-              </div>
+              </>
             ) : (
-              <p>Login with your Instagram account for personalized services</p>
+              "Login with your Instagram account for personalized services"
             )}
           </DialogDescription>
         </DialogHeader>

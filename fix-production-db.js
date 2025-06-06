@@ -28,17 +28,36 @@ async function fixProductionDatabase() {
     // Create tables if they don't exist
     console.log('🔄 Creating tables...');
     
-    await db.execute(sql`
-      CREATE TABLE IF NOT EXISTS "users" (
-        "id" serial PRIMARY KEY NOT NULL,
-        "uid" varchar(20) NOT NULL,
-        "instagram_username" text NOT NULL,
-        "password" text NOT NULL,
-        "wallet_balance" numeric(10, 2) DEFAULT '0' NOT NULL,
-        "bonus_claimed" boolean DEFAULT false NOT NULL,
-        "created_at" timestamp DEFAULT now() NOT NULL
-      )
-    `);
+    // Check if users table exists and has correct schema
+    try {
+      await db.execute(sql`SELECT uid FROM users LIMIT 1`);
+      console.log('✅ Users table has correct schema');
+    } catch (error) {
+      if (error.message.includes('does not exist')) {
+        console.log('🔄 Creating users table with correct schema...');
+        await db.execute(sql`
+          CREATE TABLE IF NOT EXISTS "users" (
+            "id" serial PRIMARY KEY NOT NULL,
+            "uid" varchar(20) NOT NULL,
+            "instagram_username" text NOT NULL,
+            "password" text NOT NULL,
+            "wallet_balance" numeric(10, 2) DEFAULT '0' NOT NULL,
+            "bonus_claimed" boolean DEFAULT false NOT NULL,
+            "created_at" timestamp DEFAULT now() NOT NULL
+          )
+        `);
+      } else if (error.message.includes('column "uid" does not exist')) {
+        console.log('🔄 Adding missing uid column to users table...');
+        await db.execute(sql`ALTER TABLE "users" ADD COLUMN "uid" varchar(20)`);
+        console.log('🔄 Updating existing users with UIDs...');
+        await db.execute(sql`
+          UPDATE "users" 
+          SET "uid" = 'UID' || UPPER(SUBSTRING(MD5(RANDOM()::text), 1, 9))
+          WHERE "uid" IS NULL
+        `);
+        await db.execute(sql`ALTER TABLE "users" ALTER COLUMN "uid" SET NOT NULL`);
+      }
+    }
     console.log('✅ Users table ready');
 
     await db.execute(sql`

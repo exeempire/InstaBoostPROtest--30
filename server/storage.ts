@@ -52,8 +52,14 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   async initializeDatabase(): Promise<void> {
     try {
-      // Create tables using raw SQL queries to ensure they exist
-      const createTablesSQL = `
+      console.log('🔄 Initializing database tables...');
+      
+      // Test database connection first
+      await db.execute(sql`SELECT 1`);
+      console.log('✅ Database connection successful');
+
+      // Create tables individually with better error handling
+      const createUserTable = sql`
         CREATE TABLE IF NOT EXISTS "users" (
           "id" serial PRIMARY KEY NOT NULL,
           "uid" varchar(255) NOT NULL,
@@ -64,8 +70,10 @@ export class DatabaseStorage implements IStorage {
           "created_at" timestamp DEFAULT now() NOT NULL,
           CONSTRAINT "users_uid_unique" UNIQUE("uid"),
           CONSTRAINT "users_instagram_username_unique" UNIQUE("instagram_username")
-        );
+        )
+      `;
 
+      const createOrdersTable = sql`
         CREATE TABLE IF NOT EXISTS "orders" (
           "id" serial PRIMARY KEY NOT NULL,
           "user_id" integer NOT NULL,
@@ -77,8 +85,10 @@ export class DatabaseStorage implements IStorage {
           "status" varchar(255) DEFAULT 'pending' NOT NULL,
           "created_at" timestamp DEFAULT now() NOT NULL,
           CONSTRAINT "orders_order_id_unique" UNIQUE("order_id")
-        );
+        )
+      `;
 
+      const createPaymentsTable = sql`
         CREATE TABLE IF NOT EXISTS "payments" (
           "id" serial PRIMARY KEY NOT NULL,
           "user_id" integer NOT NULL,
@@ -88,8 +98,10 @@ export class DatabaseStorage implements IStorage {
           "status" varchar(255) DEFAULT 'pending' NOT NULL,
           "created_at" timestamp DEFAULT now() NOT NULL,
           CONSTRAINT "payments_utr_number_unique" UNIQUE("utr_number")
-        );
+        )
+      `;
 
+      const createServicesTable = sql`
         CREATE TABLE IF NOT EXISTS "services" (
           "id" serial PRIMARY KEY NOT NULL,
           "name" varchar(255) NOT NULL,
@@ -99,40 +111,82 @@ export class DatabaseStorage implements IStorage {
           "max_order" integer NOT NULL,
           "delivery_time" varchar(255) NOT NULL,
           "active" boolean DEFAULT true NOT NULL
-        );
+        )
+      `;
 
+      const createLoginLogsTable = sql`
         CREATE TABLE IF NOT EXISTS "login_logs" (
           "id" serial PRIMARY KEY NOT NULL,
           "user_id" integer NOT NULL,
           "instagram_username" varchar(255) NOT NULL,
           "login_count" integer NOT NULL,
           "created_at" timestamp DEFAULT now() NOT NULL
-        );
-
-        DO $$ BEGIN
-          ALTER TABLE "orders" ADD CONSTRAINT "orders_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE no action ON UPDATE no action;
-        EXCEPTION
-          WHEN duplicate_object THEN null;
-        END $$;
-
-        DO $$ BEGIN
-          ALTER TABLE "payments" ADD CONSTRAINT "payments_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE no action ON UPDATE no action;
-        EXCEPTION
-          WHEN duplicate_object THEN null;
-        END $$;
-
-        DO $$ BEGIN
-          ALTER TABLE "login_logs" ADD CONSTRAINT "login_logs_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE no action ON UPDATE no action;
-        EXCEPTION
-          WHEN duplicate_object THEN null;
-        END $$;
+        )
       `;
 
-      await db.execute(sql.raw(createTablesSQL));
-      console.log('✅ Database tables initialized successfully');
+      // Create tables one by one
+      await db.execute(createUserTable);
+      console.log('✅ Users table ready');
+      
+      await db.execute(createOrdersTable);
+      console.log('✅ Orders table ready');
+      
+      await db.execute(createPaymentsTable);
+      console.log('✅ Payments table ready');
+      
+      await db.execute(createServicesTable);
+      console.log('✅ Services table ready');
+      
+      await db.execute(createLoginLogsTable);
+      console.log('✅ Login logs table ready');
+
+      // Add foreign key constraints with error handling
+      try {
+        await db.execute(sql`
+          DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints 
+                          WHERE constraint_name = 'orders_user_id_users_id_fk') THEN
+              ALTER TABLE "orders" ADD CONSTRAINT "orders_user_id_users_id_fk" 
+              FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE no action ON UPDATE no action;
+            END IF;
+          END $$
+        `);
+        
+        await db.execute(sql`
+          DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints 
+                          WHERE constraint_name = 'payments_user_id_users_id_fk') THEN
+              ALTER TABLE "payments" ADD CONSTRAINT "payments_user_id_users_id_fk" 
+              FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE no action ON UPDATE no action;
+            END IF;
+          END $$
+        `);
+        
+        await db.execute(sql`
+          DO $$ BEGIN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints 
+                          WHERE constraint_name = 'login_logs_user_id_users_id_fk') THEN
+              ALTER TABLE "login_logs" ADD CONSTRAINT "login_logs_user_id_users_id_fk" 
+              FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE no action ON UPDATE no action;
+            END IF;
+          END $$
+        `);
+        
+        console.log('✅ Foreign key constraints configured');
+      } catch (constraintError) {
+        console.log('⚠️ Foreign key constraints already exist (this is normal)');
+      }
+
+      console.log('🎉 Database initialization completed successfully');
     } catch (error) {
-      console.error('❌ Database initialization error:', error);
-      throw error;
+      console.error('❌ Database initialization failed:', error);
+      if (error instanceof Error) {
+        console.error('Error details:', error.message);
+        console.error('Stack trace:', error.stack);
+      }
+      
+      // Don't throw error to prevent server crash - just log and continue
+      console.log('⚠️ Continuing without database initialization - manual setup may be required');
     }
   }
 
@@ -226,14 +280,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async initializeServices(): Promise<void> {
-    // Check if services already exist
-    const existingServices = await db.select().from(services);
-    if (existingServices.length > 0) {
-      return;
-    }
+    try {
+      // Check if services already exist
+      const existingServices = await db.select().from(services);
+      if (existingServices.length > 0) {
+        console.log('✅ Services already initialized, skipping...');
+        return;
+      }
 
-    // Initialize default services
-    const defaultServices: InsertService[] = [
+      console.log('🔄 Initializing default services...');
+      // Initialize default services
+      const defaultServices: InsertService[] = [
       // Followers
       {
         name: "Instagram Followers - Indian",
@@ -322,6 +379,11 @@ export class DatabaseStorage implements IStorage {
     ];
 
     await db.insert(services).values(defaultServices);
+    console.log('✅ Default services created successfully');
+    } catch (error) {
+      console.error('❌ Failed to initialize services:', error);
+      throw error;
+    }
   }
 
   async logUserLogin(userId: number, instagramUsername: string): Promise<number> {

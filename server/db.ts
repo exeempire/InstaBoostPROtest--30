@@ -10,9 +10,10 @@ neonConfig.useSecureWebSocket = true;
 neonConfig.poolQueryViaFetch = true;
 
 if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+  console.error("❌ DATABASE_URL environment variable is missing!");
+  console.error("Please set DATABASE_URL in your Render environment variables.");
+  console.error("Example: postgres://user:pass@host:5432/database");
+  process.exit(1);
 }
 
 export const pool = new Pool({ 

@@ -39,13 +39,29 @@ app.use((req, res, next) => {
 (async () => {
   // Add graceful error handling for unhandled exceptions
   process.on('uncaughtException', (err) => {
-    console.error('Uncaught Exception:', err);
-    // Don't exit - let the process continue
+    console.error('❌ Uncaught Exception:', err);
+    if (process.env.NODE_ENV === 'production') {
+      console.error('🔄 Attempting to continue in production...');
+    }
   });
 
   process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-    // Don't exit - let the process continue
+    console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+    if (process.env.NODE_ENV === 'production') {
+      console.error('🔄 Attempting to continue in production...');
+    }
+  });
+
+  // Handle SIGTERM gracefully (Render sends this when stopping)
+  process.on('SIGTERM', () => {
+    console.log('📦 Received SIGTERM signal, shutting down gracefully...');
+    process.exit(0);
+  });
+
+  // Handle SIGINT gracefully (Ctrl+C)
+  process.on('SIGINT', () => {
+    console.log('📦 Received SIGINT signal, shutting down gracefully...');
+    process.exit(0);
   });
 
   const server = await registerRoutes(app);

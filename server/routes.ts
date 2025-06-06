@@ -21,16 +21,19 @@ interface AuthenticatedRequest extends Request {
   };
 }
 
-// Session configuration
+// Session configuration with production-ready settings
 const sessionConfig = session({
   secret: APP_CONFIG.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false,
+    secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   },
+  name: 'smm.sid',
+  rolling: true,
 });
 
 // Validation schemas
@@ -189,16 +192,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Test database connection
       await storage.getServices();
-      res.json({ status: "healthy", timestamp: new Date().toISOString() });
+      res.json({ 
+        status: "healthy", 
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV,
+        port: process.env.PORT || 'default'
+      });
     } catch (error) {
-      res.status(500).json({ status: "unhealthy", error: error instanceof Error ? error.message : "Unknown error" });
+      console.error("Health check failed:", error);
+      res.status(500).json({ 
+        status: "unhealthy", 
+        error: error instanceof Error ? error.message : "Unknown error",
+        timestamp: new Date().toISOString()
+      });
     }
   });
 
+  // Root endpoint for deployment verification
+  app.get("/", (req, res) => {
+    res.json({
+      message: "SMM Panel API is running",
+      status: "online",
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV
+    });
+  });
+
   // Initialize database tables, default services and setup Telegram webhook
-  await storage.initializeDatabase();
-  await storage.initializeServices();
-  await setupTelegramWebhook();
+  try {
+    await storage.initializeDatabase();
+    console.log('✅ Database initialization completed');
+  } catch (dbError) {
+    console.error('❌ Database initialization failed:', dbError);
+    console.log('⚠️ Continuing without database - manual setup required');
+  }
+
+  try {
+    await storage.initializeServices();
+    console.log('✅ Services initialization completed');
+  } catch (serviceError) {
+    console.error('❌ Services initialization failed:', serviceError);
+    console.log('⚠️ Continuing without default services');
+  }
+
+  try {
+    await setupTelegramWebhook();
+    console.log('✅ Telegram webhook setup completed');
+  } catch (telegramError) {
+    console.log('⚠️ Telegram webhook setup failed (this is normal if no token provided)');
+  }
 
   // Auth endpoints
   app.post("/api/auth/login", async (req: AuthenticatedRequest, res: Response) => {

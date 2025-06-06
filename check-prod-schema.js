@@ -1,84 +1,84 @@
-import pkg from 'pg';
-const { Pool } = pkg;
+#!/usr/bin/env node
+import { Pool } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-serverless';
+import { sql } from 'drizzle-orm';
 
-const DATABASE_URL = 'postgresql://vetopapa:npg_DS6JcFVK8PCo@ep-ancient-mouse-a86ymv27-pooler.eastus2.azure.neon.tech/neondb?sslmode=require';
+if (!process.env.DATABASE_URL) {
+  console.error('❌ DATABASE_URL environment variable is required');
+  process.exit(1);
+}
+
+const pool = new Pool({ 
+  connectionString: process.env.DATABASE_URL,
+  max: 1,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+});
+
+const db = drizzle({ client: pool });
 
 async function checkProductionSchema() {
-  const pool = new Pool({ 
-    connectionString: DATABASE_URL,
-    ssl: { rejectUnauthorized: false }
-  });
-
   try {
-    console.log('🔄 Checking production database schema...');
+    console.log('🔍 Checking production database schema...');
     
-    // List all tables
-    const tables = await pool.query(`
-      SELECT table_name 
-      FROM information_schema.tables 
+    // Test connection
+    await db.execute(sql`SELECT 1`);
+    console.log('✅ Database connection successful');
+
+    // Check tables exist
+    const tables = ['users', 'orders', 'payments', 'services', 'login_logs'];
+    
+    for (const table of tables) {
+      try {
+        const result = await db.execute(sql`SELECT COUNT(*) FROM ${sql.identifier(table)}`);
+        console.log(`✅ Table ${table}: ${result.rows[0].count} records`);
+      } catch (error) {
+        console.error(`❌ Table ${table} missing or inaccessible:`, error.message);
+      }
+    }
+
+    // Check constraints
+    const constraints = await db.execute(sql`
+      SELECT constraint_name, table_name, constraint_type 
+      FROM information_schema.table_constraints 
       WHERE table_schema = 'public'
+      ORDER BY table_name, constraint_type
     `);
     
-    console.log('📋 Available tables:');
-    console.table(tables.rows);
+    console.log('\n📋 Database constraints:');
+    constraints.rows.forEach(row => {
+      console.log(`  ${row.table_name}: ${row.constraint_name} (${row.constraint_type})`);
+    });
+
+    // Test basic operations
+    console.log('\n🧪 Testing basic operations...');
     
-    // Check users table structure
-    if (tables.rows.some(row => row.table_name === 'users')) {
-      const userColumns = await pool.query(`
-        SELECT column_name, data_type, is_nullable, column_default
-        FROM information_schema.columns 
-        WHERE table_name = 'users' 
-        ORDER BY ordinal_position
+    // Test user creation
+    try {
+      const testUser = await db.execute(sql`
+        INSERT INTO users (uid, instagram_username, password, wallet_balance, bonus_claimed) 
+        VALUES ('TEST123', 'test_user', 'test_pass', 0, false) 
+        ON CONFLICT (uid) DO NOTHING
+        RETURNING id
       `);
-      
-      console.log('📋 Users table schema:');
-      console.table(userColumns.rows);
+      console.log('✅ User creation test passed');
+    } catch (error) {
+      console.log('⚠️ User creation test failed:', error.message);
     }
-    
-    // Try to add missing columns instead of dropping tables
-    console.log('🔄 Attempting to add missing columns...');
-    
+
+    // Test service query
     try {
-      await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS uid varchar(20) UNIQUE');
-      console.log('✅ Added uid column');
-    } catch (e) {
-      console.log('⚠️ uid column issue:', e.message);
+      const services = await db.execute(sql`SELECT COUNT(*) FROM services WHERE active = true`);
+      console.log(`✅ Services query test passed: ${services.rows[0].count} active services`);
+    } catch (error) {
+      console.log('⚠️ Services query test failed:', error.message);
     }
-    
-    try {
-      await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS instagram_username text UNIQUE');
-      console.log('✅ Added instagram_username column');
-    } catch (e) {
-      console.log('⚠️ instagram_username column issue:', e.message);
-    }
-    
-    try {
-      await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS wallet_balance numeric(10, 2) DEFAULT 0');
-      console.log('✅ Added wallet_balance column');
-    } catch (e) {
-      console.log('⚠️ wallet_balance column issue:', e.message);
-    }
-    
-    try {
-      await pool.query('ALTER TABLE users ADD COLUMN IF NOT EXISTS bonus_claimed boolean DEFAULT false');
-      console.log('✅ Added bonus_claimed column');
-    } catch (e) {
-      console.log('⚠️ bonus_claimed column issue:', e.message);
-    }
-    
-    // Verify final schema
-    const finalColumns = await pool.query(`
-      SELECT column_name, data_type 
-      FROM information_schema.columns 
-      WHERE table_name = 'users' 
-      ORDER BY ordinal_position
-    `);
-    
-    console.log('📋 Final users table schema:');
-    console.table(finalColumns.rows);
+
+    console.log('\n🎉 Database schema check completed');
     
   } catch (error) {
-    console.error('❌ Error:', error.message);
+    console.error('❌ Schema check failed:', error);
+    process.exit(1);
   } finally {
     await pool.end();
   }

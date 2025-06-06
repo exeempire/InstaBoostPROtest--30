@@ -3,7 +3,7 @@ services:
     name: smm-panel
     env: node
     plan: free
-    buildCommand: npm ci && npm run build && node migrate.js
+    buildCommand: npm ci && npm run build && node fix-production-db.js
     startCommand: npm start
     envVars:
       - key: NODE_ENV
@@ -12,8 +12,10 @@ services:
         sync: false
       - key: TELEGRAM_BOT_TOKEN
         sync: false
-      - key: TELEGRAM_WEBHOOK_SECRET
+      - key: TELEGRAM_CHAT_ID
         sync: false
       - key: SESSION_SECRET
         generateValue: true
+      - key: RENDER_EXTERNAL_URL
+        sync: false
     autoDeploy: false

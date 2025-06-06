@@ -1,0 +1,50 @@
+2025-06-06T17:11:12.045274549Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2025-06-06T17:11:12.045279099Z   severity: 'ERROR',
+2025-06-06T17:11:12.04528279Z   code: '42703',
+2025-06-06T17:11:12.0452864Z   detail: undefined,
+2025-06-06T17:11:12.04529035Z   hint: 'Perhaps you meant to reference the column "users.id".',
+2025-06-06T17:11:12.0452949Z   position: '14',
+2025-06-06T17:11:12.045300111Z   internalPosition: undefined,
+2025-06-06T17:11:12.045303701Z   internalQuery: undefined,
+2025-06-06T17:11:12.045307201Z   where: undefined,
+2025-06-06T17:11:12.045310821Z   schema: undefined,
+2025-06-06T17:11:12.045314941Z   table: undefined,
+2025-06-06T17:11:12.045318562Z   column: undefined,
+2025-06-06T17:11:12.045322342Z   dataType: undefined,
+2025-06-06T17:11:12.045326492Z   constraint: undefined,
+2025-06-06T17:11:12.045330742Z   file: 'parse_relation.c',
+2025-06-06T17:11:12.045334643Z   line: '3723',
+2025-06-06T17:11:12.045338483Z   routine: 'errorMissingColumn',
+2025-06-06T17:11:12.045342353Z   sourceError: undefined
+2025-06-06T17:11:12.045346223Z }
+2025-06-06T17:11:12.045350064Z Error stack: NeonDbError: column "uid" does not exist
+2025-06-06T17:11:12.045354344Z     at execute (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+2025-06-06T17:11:12.045358904Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-06-06T17:11:12.046233258Z 5:11:12 PM [express] POST /api/auth/login 400 in 338ms :: {"error":"Login failed","message":"column …
+2025-06-06T17:11:26.192093593Z Login attempt - Request body: { instagramUsername: 'yu gyu67', password: 'nnbnbvnbv' }
+2025-06-06T17:11:26.192121155Z Validated data: { instagramUsername: 'yu gyu67', password: '***' }
+2025-06-06T17:11:26.482942212Z Login error details: NeonDbError: column "uid" does not exist
+2025-06-06T17:11:26.482963463Z     at execute (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+2025-06-06T17:11:26.482966844Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2025-06-06T17:11:26.482969774Z   severity: 'ERROR',
+2025-06-06T17:11:26.482971864Z   code: '42703',
+2025-06-06T17:11:26.482974164Z   detail: undefined,
+2025-06-06T17:11:26.482976494Z   hint: 'Perhaps you meant to reference the column "users.id".',
+2025-06-06T17:11:26.482978594Z   position: '14',
+2025-06-06T17:11:26.482981694Z   internalPosition: undefined,
+2025-06-06T17:11:26.482983885Z   internalQuery: undefined,
+2025-06-06T17:11:26.482985935Z   where: undefined,
+2025-06-06T17:11:26.483004156Z   schema: undefined,
+2025-06-06T17:11:26.483009986Z   table: undefined,
+2025-06-06T17:11:26.483012286Z   column: undefined,
+2025-06-06T17:11:26.483014427Z   dataType: undefined,
+2025-06-06T17:11:26.483016516Z   constraint: undefined,
+2025-06-06T17:11:26.483018677Z   file: 'parse_relation.c',
+2025-06-06T17:11:26.483020907Z   line: '3723',
+2025-06-06T17:11:26.483023027Z   routine: 'errorMissingColumn',
+2025-06-06T17:11:26.483025167Z   sourceError: undefined
+2025-06-06T17:11:26.483027477Z }
+2025-06-06T17:11:26.483029767Z Error stack: NeonDbError: column "uid" does not exist
+2025-06-06T17:11:26.483035938Z     at execute (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+2025-06-06T17:11:26.483038328Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-06-06T17:11:26.484108924Z 5:11:26 PM [express] POST /api/auth/login 400 in 293ms :: {"error":"Login failed","message":"column …

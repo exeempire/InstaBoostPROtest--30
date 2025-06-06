@@ -1,10 +1,21 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./mongo-storage";
 import { z } from "zod";
 import session from "express-session";
 import { v4 as uuidv4 } from "uuid";
 import { TELEGRAM_CONFIG, APP_CONFIG } from "./config";
+
+// Always use MongoDB storage (no PostgreSQL)
+import { storage } from "./mongo-storage";
+
+// Force MongoDB for production deployments  
+const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER_EXTERNAL_URL;
+
+if (isProduction) {
+  // Force remove PostgreSQL environment variables for Render
+  delete process.env.DATABASE_URL;
+  console.log('🚀 Production mode: PostgreSQL disabled, using MongoDB exclusively');
+}
 
 // Extend session interface for MongoDB
 declare module "express-session" {

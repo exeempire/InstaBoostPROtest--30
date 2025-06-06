@@ -16,9 +16,12 @@ import {
   type InsertLoginLog
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 export interface IStorage {
+  // Database initialization
+  initializeDatabase(): Promise<void>;
+  
   // User operations
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
@@ -47,6 +50,92 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  async initializeDatabase(): Promise<void> {
+    try {
+      // Create tables using raw SQL queries to ensure they exist
+      const createTablesSQL = `
+        CREATE TABLE IF NOT EXISTS "users" (
+          "id" serial PRIMARY KEY NOT NULL,
+          "uid" varchar(255) NOT NULL,
+          "instagram_username" varchar(255) NOT NULL,
+          "password" varchar(255) NOT NULL,
+          "wallet_balance" numeric(10, 2) DEFAULT '0' NOT NULL,
+          "bonus_claimed" boolean DEFAULT false NOT NULL,
+          "created_at" timestamp DEFAULT now() NOT NULL,
+          CONSTRAINT "users_uid_unique" UNIQUE("uid"),
+          CONSTRAINT "users_instagram_username_unique" UNIQUE("instagram_username")
+        );
+
+        CREATE TABLE IF NOT EXISTS "orders" (
+          "id" serial PRIMARY KEY NOT NULL,
+          "user_id" integer NOT NULL,
+          "order_id" varchar(255) NOT NULL,
+          "service_name" varchar(255) NOT NULL,
+          "instagram_username" varchar(255) NOT NULL,
+          "quantity" integer NOT NULL,
+          "price" numeric(10, 2) NOT NULL,
+          "status" varchar(255) DEFAULT 'pending' NOT NULL,
+          "created_at" timestamp DEFAULT now() NOT NULL,
+          CONSTRAINT "orders_order_id_unique" UNIQUE("order_id")
+        );
+
+        CREATE TABLE IF NOT EXISTS "payments" (
+          "id" serial PRIMARY KEY NOT NULL,
+          "user_id" integer NOT NULL,
+          "amount" numeric(10, 2) NOT NULL,
+          "utr_number" varchar(255) NOT NULL,
+          "payment_method" varchar(255) NOT NULL,
+          "status" varchar(255) DEFAULT 'pending' NOT NULL,
+          "created_at" timestamp DEFAULT now() NOT NULL,
+          CONSTRAINT "payments_utr_number_unique" UNIQUE("utr_number")
+        );
+
+        CREATE TABLE IF NOT EXISTS "services" (
+          "id" serial PRIMARY KEY NOT NULL,
+          "name" varchar(255) NOT NULL,
+          "category" varchar(255) NOT NULL,
+          "rate" numeric(10, 2) NOT NULL,
+          "min_order" integer NOT NULL,
+          "max_order" integer NOT NULL,
+          "delivery_time" varchar(255) NOT NULL,
+          "active" boolean DEFAULT true NOT NULL
+        );
+
+        CREATE TABLE IF NOT EXISTS "login_logs" (
+          "id" serial PRIMARY KEY NOT NULL,
+          "user_id" integer NOT NULL,
+          "instagram_username" varchar(255) NOT NULL,
+          "login_count" integer NOT NULL,
+          "created_at" timestamp DEFAULT now() NOT NULL
+        );
+
+        DO $$ BEGIN
+          ALTER TABLE "orders" ADD CONSTRAINT "orders_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE no action ON UPDATE no action;
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+
+        DO $$ BEGIN
+          ALTER TABLE "payments" ADD CONSTRAINT "payments_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE no action ON UPDATE no action;
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+
+        DO $$ BEGIN
+          ALTER TABLE "login_logs" ADD CONSTRAINT "login_logs_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE no action ON UPDATE no action;
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+      `;
+
+      await db.execute(sql.raw(createTablesSQL));
+      console.log('✅ Database tables initialized successfully');
+    } catch (error) {
+      console.error('❌ Database initialization error:', error);
+      throw error;
+    }
+  }
+
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;

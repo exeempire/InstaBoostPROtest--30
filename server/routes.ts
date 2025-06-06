@@ -195,7 +195,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Initialize default services and setup Telegram webhook
+  // Initialize database tables, default services and setup Telegram webhook
+  await storage.initializeDatabase();
   await storage.initializeServices();
   await setupTelegramWebhook();
 

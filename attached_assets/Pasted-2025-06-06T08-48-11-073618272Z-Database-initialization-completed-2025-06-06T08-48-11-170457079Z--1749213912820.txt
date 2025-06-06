@@ -1,0 +1,50 @@
+2025-06-06T08:48:11.073618272Z ✅ Database initialization completed
+2025-06-06T08:48:11.170457079Z ❌ Failed to initialize services: NeonDbError: relation "services" does not exist
+2025-06-06T08:48:11.170484339Z     at execute (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+2025-06-06T08:48:11.170488749Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2025-06-06T08:48:11.17049436Z   severity: 'ERROR',
+2025-06-06T08:48:11.17049802Z   code: '42P01',
+2025-06-06T08:48:11.17050142Z   detail: undefined,
+2025-06-06T08:48:11.17050508Z   hint: undefined,
+2025-06-06T08:48:11.17050878Z   position: '99',
+2025-06-06T08:48:11.17051293Z   internalPosition: undefined,
+2025-06-06T08:48:11.17051675Z   internalQuery: undefined,
+2025-06-06T08:48:11.17052028Z   where: undefined,
+2025-06-06T08:48:11.170524Z   schema: undefined,
+2025-06-06T08:48:11.17052712Z   table: undefined,
+2025-06-06T08:48:11.17053061Z   column: undefined,
+2025-06-06T08:48:11.17053422Z   dataType: undefined,
+2025-06-06T08:48:11.170537501Z   constraint: undefined,
+2025-06-06T08:48:11.170540841Z   file: 'parse_relation.c',
+2025-06-06T08:48:11.170544191Z   line: '1449',
+2025-06-06T08:48:11.170548041Z   routine: 'parserOpenTable',
+2025-06-06T08:48:11.170551381Z   sourceError: undefined
+2025-06-06T08:48:11.170554951Z }
+2025-06-06T08:48:11.170572551Z ❌ Services initialization failed: NeonDbError: relation "services" does not exist
+2025-06-06T08:48:11.170572801Z ⚠️ Continuing without default services
+2025-06-06T08:48:11.170611242Z     at execute (file:///opt/render/project/src/node_modules/@neondatabase/serverless/index.mjs:1556:55)
+2025-06-06T08:48:11.170615062Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2025-06-06T08:48:11.170618872Z   severity: 'ERROR',
+2025-06-06T08:48:11.170621992Z   code: '42P01',
+2025-06-06T08:48:11.170625492Z   detail: undefined,
+2025-06-06T08:48:11.170628883Z   hint: undefined,
+2025-06-06T08:48:11.170632753Z   position: '99',
+2025-06-06T08:48:11.170636413Z   internalPosition: undefined,
+2025-06-06T08:48:11.170639853Z   internalQuery: undefined,
+2025-06-06T08:48:11.170642853Z   where: undefined,
+2025-06-06T08:48:11.170645913Z   schema: undefined,
+2025-06-06T08:48:11.170649043Z   table: undefined,
+2025-06-06T08:48:11.170651783Z   column: undefined,
+2025-06-06T08:48:11.170654553Z   dataType: undefined,
+2025-06-06T08:48:11.170657323Z   constraint: undefined,
+2025-06-06T08:48:11.170659993Z   file: 'parse_relation.c',
+2025-06-06T08:48:11.170662483Z   line: '1449',
+2025-06-06T08:48:11.170665333Z   routine: 'parserOpenTable',
+2025-06-06T08:48:11.170668673Z   sourceError: undefined
+2025-06-06T08:48:11.170671764Z }
+2025-06-06T08:48:11.694079849Z ⚠️ Telegram webhook setup failed: {"ok":false,"error_code":400,"description":"Bad Request: bad webhook: Failed to resolve host: Name or service not known"}
+2025-06-06T08:48:11.696057024Z ✅ Telegram webhook setup completed
+2025-06-06T08:48:11.696896254Z 🚀 Server running on port 3000
+2025-06-06T08:48:11.697343264Z 📡 Environment: production
+2025-06-06T08:48:11.697351814Z 🌐 Access URL: http://0.0.0.0:3000
+2025-06-06T08:48:13.055527999Z ==> Your service is live 🎉

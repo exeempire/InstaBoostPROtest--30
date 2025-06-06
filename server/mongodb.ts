@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
-// MongoDB connection with proper configuration
-const MONGODB_URI = process.env.MONGODB_URI || process.env.DATABASE_URL || 'mongodb://localhost:27017/smm-panel';
+// MongoDB connection with your actual credentials
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://instaboost_user:uX1YzKjiOETNhyYj@cluster0.tolxjiz.mongodb.net/instaboost?retryWrites=true&w=majority&appName=Cluster0';
 
 // User Schema
 const userSchema = new mongoose.Schema({

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
-// MongoDB connection
-const MONGODB_URI = process.env.MONGODB_URI || process.env.DATABASE_URL || 'mongodb+srv://smmpanel:smmpanel123@cluster0.mongodb.net/smm-panel?retryWrites=true&w=majority';
+// MongoDB connection with your actual credentials
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://instaboost_user:uX1YzKjiOETNhyYj@cluster0.tolxjiz.mongodb.net/instaboost?retryWrites=true&w=majority&appName=Cluster0';
 
 // Simple schemas without complex types
 const userSchema = new mongoose.Schema({

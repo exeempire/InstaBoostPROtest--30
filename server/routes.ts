@@ -6,17 +6,17 @@ import session from "express-session";
 import { v4 as uuidv4 } from "uuid";
 import { TELEGRAM_CONFIG, APP_CONFIG } from "./config";
 
-// Extend session interface
+// Extend session interface for MongoDB
 declare module "express-session" {
   interface SessionData {
-    userId?: number;
+    userId?: string;
     uid?: string;
   }
 }
 
 interface AuthenticatedRequest extends Request {
   session: session.Session & Partial<session.SessionData> & {
-    userId?: number;
+    userId?: string;
     uid?: string;
   };
 }
@@ -285,7 +285,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           uid,
           instagramUsername,
           password,
-          walletBalance: "0",
+          walletBalance: 0,
           bonusClaimed: false,
         });
         isNewUser = true;
@@ -513,7 +513,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("🔘 Button clicked:", data);
         
         if (data.startsWith("accept_payment_")) {
-          const paymentId = parseInt(data.replace("accept_payment_", ""));
+          const paymentId = data.replace("accept_payment_", "");
           console.log("✅ Processing payment acceptance for ID:", paymentId);
           
           const payment = await storage.getPayment(paymentId);

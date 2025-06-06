@@ -1,10 +1,10 @@
 services:
   - type: web
     name: instaboost-pro
-    runtime: node
+    env: node
     plan: free
     buildCommand: npm install
-    startCommand: NODE_ENV=production tsx server/index.ts
+    startCommand: npm run dev
     envVars:
       - key: NODE_ENV
         value: production
@@ -18,3 +18,5 @@ services:
         value: YJ!*NpP1@l|R5Iy)rG<y"-XyDf}#xn
       - key: JWT_SECRET
         value: YJ!*NpP1@l|R5Iy)rG<y"-XyDf}#xn
+      - key: PORT
+        value: 10000

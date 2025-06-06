@@ -3,10 +3,10 @@ import mongoose from 'mongoose';
 // MongoDB connection with your actual credentials
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://instaboost_user:uX1YzKjiOETNhyYj@cluster0.tolxjiz.mongodb.net/instaboost?retryWrites=true&w=majority&appName=Cluster0';
 
-// Simple schemas without complex types
+// Clean MongoDB schemas
 const userSchema = new mongoose.Schema({
-  uid: { type: String, required: true, unique: true },
-  instagramUsername: { type: String, required: true, unique: true },
+  uid: { type: String, required: true, unique: true, index: true },
+  instagramUsername: { type: String, required: true, unique: true, index: true },
   password: { type: String, required: true },
   walletBalance: { type: Number, default: 0 },
   bonusClaimed: { type: Boolean, default: false }

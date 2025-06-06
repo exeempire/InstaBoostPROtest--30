@@ -54,9 +54,24 @@ export class DatabaseStorage implements IStorage {
     try {
       console.log('🔄 Initializing database tables...');
       
-      // Test database connection first
-      await db.execute(sql`SELECT 1`);
-      console.log('✅ Database connection successful');
+      // Test database connection first with retry logic
+      let connectionAttempts = 0;
+      const maxAttempts = 3;
+      
+      while (connectionAttempts < maxAttempts) {
+        try {
+          await db.execute(sql`SELECT 1`);
+          console.log('✅ Database connection successful');
+          break;
+        } catch (connError) {
+          connectionAttempts++;
+          console.log(`⚠️ Connection attempt ${connectionAttempts}/${maxAttempts} failed`);
+          if (connectionAttempts === maxAttempts) {
+            throw connError;
+          }
+          await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds before retry
+        }
+      }
 
       // Create tables individually with better error handling
       const createUserTable = sql`
@@ -124,21 +139,46 @@ export class DatabaseStorage implements IStorage {
         )
       `;
 
-      // Create tables one by one
-      await db.execute(createUserTable);
-      console.log('✅ Users table ready');
+      // Create tables one by one with individual error handling
+      try {
+        await db.execute(createUserTable);
+        console.log('✅ Users table ready');
+      } catch (error) {
+        console.error('❌ Failed to create users table:', error);
+        throw error;
+      }
       
-      await db.execute(createOrdersTable);
-      console.log('✅ Orders table ready');
+      try {
+        await db.execute(createOrdersTable);
+        console.log('✅ Orders table ready');
+      } catch (error) {
+        console.error('❌ Failed to create orders table:', error);
+        throw error;
+      }
       
-      await db.execute(createPaymentsTable);
-      console.log('✅ Payments table ready');
+      try {
+        await db.execute(createPaymentsTable);
+        console.log('✅ Payments table ready');
+      } catch (error) {
+        console.error('❌ Failed to create payments table:', error);
+        throw error;
+      }
       
-      await db.execute(createServicesTable);
-      console.log('✅ Services table ready');
+      try {
+        await db.execute(createServicesTable);
+        console.log('✅ Services table ready');
+      } catch (error) {
+        console.error('❌ Failed to create services table:', error);
+        throw error;
+      }
       
-      await db.execute(createLoginLogsTable);
-      console.log('✅ Login logs table ready');
+      try {
+        await db.execute(createLoginLogsTable);
+        console.log('✅ Login logs table ready');
+      } catch (error) {
+        console.error('❌ Failed to create login logs table:', error);
+        throw error;
+      }
 
       // Add foreign key constraints with error handling
       try {

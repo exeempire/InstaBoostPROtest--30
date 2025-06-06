@@ -1,19 +1,19 @@
 services:
   - type: web
     name: smm-panel
-    runtime: node
+    env: node
     plan: free
-    buildCommand: npm install && npm run build
-    startCommand: npm run start
-    healthCheckPath: /
+    buildCommand: npm ci && npm run build && node migrate.js
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
         sync: false
-      - key: SESSION_SECRET
-        generateValue: true
       - key: TELEGRAM_BOT_TOKEN
         sync: false
-      - key: TELEGRAM_CHAT_ID
+      - key: TELEGRAM_WEBHOOK_SECRET
         sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+    autoDeploy: false

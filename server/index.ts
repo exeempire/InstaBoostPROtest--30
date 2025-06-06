@@ -86,11 +86,11 @@ app.use((req, res, next) => {
 
   // Use environment port for production (Render) or fallback to 5000 for development
   const port = process.env.PORT || 5000;
-  server.listen({
-    port: parseInt(port.toString()),
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
+  
+  // For Render deployment, we need to bind to 0.0.0.0 on the specified port
+  server.listen(parseInt(port.toString()), "0.0.0.0", () => {
+    console.log(`🚀 Server running on port ${port}`);
+    console.log(`📡 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🌐 Access URL: http://0.0.0.0:${port}`);
   });
 })();

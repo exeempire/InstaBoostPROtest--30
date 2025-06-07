@@ -33,11 +33,20 @@ interface AuthenticatedRequest extends Request {
   };
 }
 
-// Simple session configuration for MongoDB
+// Production session configuration with MongoDB store
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://instaboost_user:uX1YzKjiOETNhyYj@cluster0.tolxjiz.mongodb.net/instaboost?retryWrites=true&w=majority&appName=Cluster0';
+
 const sessionConfig = session({
   secret: APP_CONFIG.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  store: process.env.NODE_ENV === 'production' 
+    ? MongoStore.create({
+        mongoUrl: MONGODB_URI,
+        ttl: 24 * 60 * 60, // 1 day
+        touchAfter: 24 * 3600 // lazy session update
+      })
+    : undefined,
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,

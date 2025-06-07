@@ -40,6 +40,19 @@
   --radius: 1rem;
 }
 
+/* Enhanced modal backdrop blur effects */
+[data-radix-dialog-overlay] {
+  backdrop-filter: blur(8px) saturate(150%);
+  background: rgba(14, 29, 24, 0.75) !important;
+}
+
+[data-radix-dialog-content] {
+  backdrop-filter: blur(16px);
+  background: rgba(28, 45, 36, 0.95) !important;
+  border: 1px solid rgba(214, 173, 96, 0.3);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
 @layer base {
   * {
     @apply border-border;

@@ -158,7 +158,7 @@ export function ServiceModal({ isOpen, onClose, service }: ServiceModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg bg-charcoal border-gold/30">
+      <DialogContent className="sm:max-w-lg bg-charcoal/95 backdrop-blur-md border-gold/30 shadow-2xl">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold text-gold mb-2">
             {service.name}

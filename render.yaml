@@ -1,20 +1,23 @@
 services:
   - type: web
-    name: instaboost-pro
-    runtime: node
+    name: instaboost-smm-panel
+    env: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install && npm run build
     startCommand: NODE_ENV=production tsx server/index.ts
     envVars:
       - key: NODE_ENV
         value: production
       - key: MONGODB_URI
-        value: mongodb+srv://instaboost_user:uX1YzKjiOETNhyYj@cluster0.tolxjiz.mongodb.net/instaboost?retryWrites=true&w=majority&appName=Cluster0
+        fromDatabase:
+          name: mongodb
+          property: connectionString
       - key: TELEGRAM_BOT_TOKEN
-        value: 7275717734:AAE6bq0Mdypn_wQL6F1wpphzEtLAco3_B3Y
+        sync: false
       - key: TELEGRAM_CHAT_ID
-        value: 6881713177
+        sync: false
       - key: SESSION_SECRET
-        value: YJ!*NpP1@l|R5Iy)rG<y"-XyDf}#xn
+        generateValue: true
       - key: JWT_SECRET
-        value: YJ!*NpP1@l|R5Iy)rG<y"-XyDf}#xn
+        generateValue: true
+    healthCheckPath: /api/health

@@ -2,6 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { z } from "zod";
 import session from "express-session";
+import MongoStore from 'connect-mongo';
 import { v4 as uuidv4 } from "uuid";
 import { TELEGRAM_CONFIG, APP_CONFIG } from "./config";
 

@@ -158,7 +158,7 @@ export function ServiceModal({ isOpen, onClose, service }: ServiceModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg bg-charcoal/95 backdrop-blur-md border-gold/30 shadow-2xl">
+      <DialogContent className="sm:max-w-lg backdrop-blur-md border-gold/50 shadow-2xl" style={{ backgroundColor: 'rgba(28, 45, 36, 0.95)' }}>
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold text-gold mb-2">
             {service.name}
@@ -170,7 +170,7 @@ export function ServiceModal({ isOpen, onClose, service }: ServiceModalProps) {
 
         <div className="space-y-6">
           {/* Service Details */}
-          <div className="bg-charcoal-dark/50 border border-gold/20 rounded-lg p-4 grid grid-cols-2 gap-4 text-sm">
+          <div className="border border-gold/30 rounded-lg p-4 grid grid-cols-2 gap-4 text-sm" style={{ backgroundColor: 'rgba(214, 173, 96, 0.1)' }}>
             <div>
               <span className="text-cream/60">Rate:</span>
               <span className="text-gold font-semibold ml-2">
